@@ -1,0 +1,27 @@
+{
+  "name": "echoes-of-oblivion",
+  "version": "1.0.0",
+  "description": "Hold  ur breath",
+  "homepage": "https://github.com/Aravcode2005/Echoes-of-Oblivion#readme",
+  "bugs": {
+    "url": "https://github.com/Aravcode2005/Echoes-of-Oblivion/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aravcode2005/Echoes-of-Oblivion.git"
+  },
+  "license": "ISC",
+  "author": "Aru",
+  "type": "commonjs",
+  "main": "heartbeat.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "dependencies": {
+    "body-parser": "^2.2.2",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.14"
+  }
+}
