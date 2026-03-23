@@ -14,40 +14,35 @@ class Player {
     }
 };
 class Playeractions extends Player {
-    x=0;
-    y=0;
-    log = [this.x, this.y];
-      controls=()=>{
-        document.addEventListener("keydown",(event) =>{
+    x = 0;
+    y = 0;
+    controls = () => {
+        document.addEventListener("keydown", (event) => {
             const keyName = event.key;
             if (keyName === 'U') {
                 this.y += 1;
-                this.log[1] =this.y;
+
             }
             if (keyName === 'D') {
                 this.y -= 1;
-                this.log[1]=this.y;
             }
             if (keyName === 'R') {
                 this.x += 1;
-                this.log[0]=this.x
+
             }
             if (keyName === 'L') {
                 this.x -= 1;
-                this.log[0] =this.x;
+
             }
         })
     }
 
     fullinfo() {
-        console.log("Name" + this.Name);
-        console.log("Era" + this.Era);
-        console.log("Cx" + this.log[0]);
-        console.log("Cy" + this.log[1]);
+        console.log( [this.x,this.y]);
     }
 }
 const player1 = new Playeractions("Xing", "Past", "Scout");
-player1.controls();
+   player1.controls();
 setInterval(() => {
     player1.fullinfo();
 }, 1000);
