@@ -29,9 +29,20 @@ class Playeractions extends Player {
     Z = 0;
     theta;
     color;
+    moveUp;
+    moveDown;
+    moveLeft;
+    moveRight;
+    moveForward;
+    moveBackward;
+    rotate;
     movementdynamics = [];
     constructor(name, era, position, X, Y, Z, Color, arr = [], Theta) {
         super(name, era, position);
+        this.moveRight = false;
+        this.moveLeft = false;
+        this.moveForward = false;
+        this.moveBackward = false;
         this.x = X;
         this.y = Y;
         this.Z = Z;
@@ -45,59 +56,69 @@ class Playeractions extends Player {
         this.player.position.set(X, Y, Z);
         Scene.add(this.player);
     }
-
-    controls = () => {
+    intent = () => {
         document.addEventListener("keydown", (event) => {
             const keyName = event.key.toLowerCase();
             if (this !== activePlayer) {
                 return;
             }
             if (keyName === 'u') {
-                this.y += 1;
-                this.player.position.set(this.x, this.y, this.Z);
-                console.log("Updating y towards upside " + this.y);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveUp = true;
             }
             if (keyName === 'd') {
-                this.y -= 1;
-                console.log("Updating y towards down " + this.y);
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveDown = true;
             }
             if (keyName === 'r') {
-                this.x += 1;
-                console.log("Updating x towards right " + this.x);
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveRight = true;
             }
             if (keyName === 'l') {
-                this.x -= 1;
-                console.log("Updating x towards left  " + this.x);
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveLeft = true;
             }
             if (keyName === 'f') {
-                this.Z -= 1;
-                console.log("Updating z towards forward " + this.Z);
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveForward = true;
             }
-
             if (keyName === 'b') {
-                this.Z += 1;
-                console.log("Updating z towards back " + this.Z);
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z]);
+                this.moveBackward = true;
             }
 
             if (keyName === 's') {
-                const newX = this.x * Math.cos(this.theta) - this.y * Math.sin(this.theta);
-                const newY = this.x * Math.sin(this.theta) + this.y * Math.cos(this.theta);
-                this.x = newX;
-                this.y = newY;
-                console.log("Rotating");
-                this.player.position.set(this.x, this.y, this.Z);
-                this.movementdynamics.push([this.x, this.y, this.Z])
+                this.rotate = true;
+            }
+        })
+
+        document.addEventListener("keyup", (event) => {
+            const keyName = event.key.toLowerCase();
+            if (this !== activePlayer) {
+                return;
+            }
+            if (keyName === 'u') {
+
+                this.moveUp = false;
+            }
+            if (keyName === 'd') {
+
+                this.moveDown = false;
+            }
+            if (keyName === 'r') {
+
+                this.moveRight = false;
+            }
+            if (keyName === 'l') {
+
+                this.moveLeft = false;
+            }
+            if (keyName === 'f') {
+
+                this.moveForward = false;
+            }
+            if (keyName === 'b') {
+
+                this.moveBackward = false;
+            }
+
+            if (keyName === 's') {
+
+                this.rotate = false;
             }
         })
     }
@@ -108,28 +129,66 @@ class Playeractions extends Player {
         console.log(this.movementdynamics);
     }
 }
+
+class World {
+    pulse;
+    playerList = [];
+    constructor(x, y, z, heartPulse, Players = []) {
+        this.pulse = heartPulse;
+        this.playerList = Players;
+    }
+
+    tick() {
+        for (let i = 0; i < this.playerList.length; i++) {
+            let currentplayer = this.playerList[i];
+            if (currentplayer.moveRight) {
+                currentplayer.x++;
+                currentplayer.player.position.set(currentplayer.x, currentplayer.y, currentplayer.Z);
+            }
+            if (currentplayer.moveLeft) {
+                currentplayer.x--;
+                currentplayer.player.position.set(currentplayer.x, currentplayer.y, currentplayer.Z);
+            }
+            if (currentplayer.moveForward) {
+                currentplayer.Z--;
+                currentplayer.player.position.set(currentplayer.x, currentplayer.y, currentplayer.Z);
+            }
+
+            if (currentplayer.moveBackward) {
+                currentplayer.Z++;
+                currentplayer.player.position.set(currentplayer.x, currentplayer.y, currentplayer.Z);
+            }
+        }
+
+    }
+}
+
 const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xff0000, [], 45);
-player1.controls();
+player1.intent();
 const player2 = new Playeractions("Zeus", "Medivial", "Warrior", 0, 0, 0, 0x00ff00, [], 45);
-player2.controls();
+player2.intent();
 const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x0000ff, [], 45);
-player3.controls();
+player3.intent();
 const player4 = new Playeractions("Xong", "Past", "Monk", 10, -10, 0, 0xff0000, [], 45);
-player4.controls();
+player4.intent();
 const player5 = new Playeractions("Zous", "Medivial", "Warrior", 20, 0, 0, 0x00ff00, [], 45);
-player5.controls();
+player5.intent();
 const player6 = new Playeractions("Alegx", "Future", "Engineer", 15, 10, 0, 0x0000ff, [], 45);
-player6.controls();
+player6.intent();
 let activePlayer = player1;
-playerrecord=[player1,player2,player3,player4,player5,player6];
+playerrecord = [player1, player2, player3, player4, player5, player6];
 document.addEventListener("keydown", (event) => {
     const button = event.key;
 
     if (button >= '1' && button <= '6') {
-        activePlayer = playerrecord[Number(button)-1];
+        activePlayer = playerrecord[Number(button) - 1];
         return;
     }
 });
+const world = new World(0, 0, 0, 100, playerrecord);
+setInterval(() => {
+    world.tick();
+}, world.pulse);
 setInterval(() => activePlayer.fullinfo(), 10000);
 const canvas = document.getElementById("gameCanvas");
 const renderer = new THREE.WebGLRenderer({
@@ -141,5 +200,4 @@ function animate() {
     renderer.render(Scene, PerspectiveCamera);
 }
 animate();
-
 
