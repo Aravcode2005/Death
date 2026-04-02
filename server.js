@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const http = require('http');
+const server = http.createServer(app);
 const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/', (req, res, next) => {
@@ -19,5 +21,13 @@ app.get('/heartBeat', (req, res, next) => {
         pageTitle: "HeartBeat"
     })
 })
-console.log("http://localhost:3000");
-app.listen(3000);
+
+const ws = require('ws');
+const wss = new ws.Server({ server });
+wss.on('connection', socket => {
+    socket.on('message', msg => {
+        socket.send(`Echo:${msg}`);
+    });
+    socket.on('close', () => console.log('Client disconnected'));
+});
+server.listen(3000, () => console.log("http://localhost:3000"));
