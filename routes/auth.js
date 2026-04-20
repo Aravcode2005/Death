@@ -1,26 +1,8 @@
-const userdata = require('../model/user');
-const dotenv = require('dotenv');
-dotenv.config();
-exports.getSignup = (req, res, next) => {
-    res.render("signup", {
-        pageTitle: "Signup"
-    })
-}
-exports.postSignup = async (req, res, next) => {
-    try {
-        const name = req.body.Name;
-        const email = req.body.email;
-        const password = req.body.Pswd;
-        await userdata.insertOne({
-            name: name,
-            email: email,
-            password: password
-        })
-        res.redirect('/login');
-    }
-    catch (error) {
-        console.log(err);
-        res.status(500).send("Error in saving the user");
-    }
-
-}
+const express = require('express');
+const authController = require('../controllers/auth');
+const router = express.Router();
+router.get('/signup', authController.getSignup);
+router.post('/signup', authController.postSignup);
+router.get('/signin', authController.getSignin);
+router.post('/signin', authController.postSignin);
+module.exports = router;

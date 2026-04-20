@@ -4,14 +4,19 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const bodyParser = require('body-parser');
+const authRoutes=require('./routes/auth');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.get('/', (req, res, next) => {
-    res.redirect('/EchoesOfOblivion');
+    res.render('Eco', {
+        pageTitle: "Echoes of Oblivion",
+        junglelink: '/mainScene',
+        sealink: '/sea'
+    })
 })
 
 app.get('/EchoesOfOblivion', (req, res, next) => {
     res.render('Eco', {
-        pageTitle: "HomePage",
+        pageTitle: "Echoes of Oblivion",
         junglelink: '/mainScene',
         sealink: '/sea'
     })
@@ -34,6 +39,8 @@ app.get('/heartBeat', (req, res, next) => {
         pageTitle: "HeartBeat"
     })
 })
+app.use(authRoutes);
+
 const ws = require('ws');
 const wss = new ws.Server({ server });
 wss.on('connection', socket => {
