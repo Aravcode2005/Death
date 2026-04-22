@@ -6,14 +6,16 @@ const server = http.createServer(app);
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const session = require('express-session');
+const flash = require('connect-flash');
+require('./util/database');
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use(session({
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
-    store: store
 }))
+app.use(flash());
+app.use(flash());
 app.get('/', (req, res, next) => {
     res.render('Eco', {
         pageTitle: "Echoes of Oblivion",
@@ -21,9 +23,6 @@ app.get('/', (req, res, next) => {
         sealink: '/sea'
     })
 })
-
-
-
 app.get('/EchoesOfOblivion', (req, res, next) => {
     res.render('Eco', {
         pageTitle: "Echoes of Oblivion",
@@ -50,7 +49,6 @@ app.get('/heartBeat', (req, res, next) => {
     })
 })
 app.use(authRoutes);
-
 const ws = require('ws');
 const { Session } = require('inspector');
 const wss = new ws.Server({ server });
