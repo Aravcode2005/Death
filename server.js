@@ -4,8 +4,16 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const bodyParser = require('body-parser');
-const authRoutes=require('./routes/auth');
+const authRoutes = require('./routes/auth');
+const session = require('express-session');
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(session({
+    secret: 'my secret',
+    resave: false,
+    saveUninitialized: false,
+    store: store
+}))
 app.get('/', (req, res, next) => {
     res.render('Eco', {
         pageTitle: "Echoes of Oblivion",
@@ -13,6 +21,8 @@ app.get('/', (req, res, next) => {
         sealink: '/sea'
     })
 })
+
+
 
 app.get('/EchoesOfOblivion', (req, res, next) => {
     res.render('Eco', {
@@ -42,9 +52,10 @@ app.get('/heartBeat', (req, res, next) => {
 app.use(authRoutes);
 
 const ws = require('ws');
+const { Session } = require('inspector');
 const wss = new ws.Server({ server });
 wss.on('connection', socket => {
-    let id=toString(Math.random()*100);
+    let id = toString(Math.random() * 100);
     socket.on('message', msg => {
         socket.send(`Echo:${msg}`);
     });
