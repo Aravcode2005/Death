@@ -4,14 +4,39 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 dotenv.config();
 exports.getSignin = (req, res, next) => {
+    let message = req.flash('error');
+    if (message.length > 0) {
+        message = message[0];
+    }
+    else {
+        message = null;
+    }
     res.render("signin", {
-        pageTitle: "Signin"
-    })
+        path: '/signin',
+        pageTitle: "Signin",
+        oldInput: {
+            email: ' ',
+            password: ' '
+        },
+      validationErrors:[]
+    });
 }
 exports.postSignin = async (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.Pswd;
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).render('signin', {
+                path: '/signin',
+                pageTitle: 'Signin',
+                errorMessage: errors.array()[0].msg,
+                oldInput: {
+                    email: email,
+                    password: password
+                }
+            })
+        }
         const user = await userdata.findOne({ email: email });
         if (!user) {
             req.flash('error', 'Invalid Email or password');
@@ -31,7 +56,6 @@ exports.postSignin = async (req, res, next) => {
         res.redirect('/signin');
     }
 }
-
 exports.getSignup = (req, res, next) => {
     res.render("signup", {
         pageTitle: "Signup"
@@ -48,7 +72,7 @@ exports.postSignup = async (req, res, next) => {
             email: email,
             password: hashedpassword
         })
-        res.redirect('/');
+        res.redirect('/signin');
     }
     catch (error) {
         console.log(error);

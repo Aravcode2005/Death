@@ -10,11 +10,11 @@
 <div class ="controls">
 <form method="POST" action="/signin" id="userCredentials" name="userCredentials">
     <p>
-   <input type="text" name="email" id="email" placeholder="Enter your email">
+   <input type="email" name="email" id="email" placeholder="Enter your email" value="<%=oldInput.email%>">
    </input>
-    </p>
+     </p>
     <p>
-   <input type="password" name="Pswd" id="Pswd" placeholder="Enter your password">
+   <input type="password" name="Pswd" id="Pswd" placeholder="Enter your password" value="<%=oldInput.password%>">
    </input>
    </p>
   <button  type="submit" id="save" name="save"> Enter </button>

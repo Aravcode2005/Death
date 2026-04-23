@@ -1,5 +1,6 @@
-const Scene = new THREE.Scene();
 
+const Scene = new THREE.Scene();
+const socket = io("http://localhost:3000");
 Scene.background = new THREE.Color(0x262626);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 Scene.add(ambientLight);
@@ -10,7 +11,6 @@ const PerspectiveCamera = new THREE.PerspectiveCamera(
     0.1,
     1000
 );
-
 class Player {
     Name;
     Era;
@@ -24,7 +24,13 @@ class Player {
         console.log("Gathering the info......" + "name->" + this.Name + "Era->" + this.Era + "Position" + this.Position);
     }
 }
-
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 32, 32), new THREE.MeshStandardMaterial({
+    roughness: 0.9,
+    color: 0x7cb342
+  })
+);
+floor.rotation.x = -Math.PI / 2;
+Scene.add(floor);
 class Playeractions extends Player {
     x = 0;
     y = 0;
@@ -60,8 +66,6 @@ class Playeractions extends Player {
         console.log(this.Name, this.Era, this.Position, this.movementdynamics);
     }
 }
-
-
 class World {
     pulse;
     playerList = [];
@@ -184,31 +188,18 @@ document.addEventListener("keyup", (event) => {
         activePlayer[keyMap[key]] = false;
     }
 });
-const socket = new WebSocket(`ws://${window.location.host}`);
-socket.addEventListener('message', (event) => {
-    let incoming;
-    try {
-        incoming = JSON.parse(event.data);
-    } catch (e) {
-        console.error("Failed to parse message:", event.data);
-        return;
-    }
-    console.log("Received:", incoming);
-    if (incoming.id !== activePlayer.Name) {
-        const remote = playerrecord.find(p => p.Name === incoming.id);
-        if (remote) {
-            remote.x = incoming.positions[0];
-            remote.y = incoming.positions[1];
-            remote.Z = incoming.positions[2];
-            remote.player.position.set(remote.x, remote.y, remote.Z);
-
-        }
-    }
-});
+socket.on('connect', () => {
+    console.log("Connected", socket.id);
+    console.log("This is X coordinate of the current player" + activePlayer.x);
+    console.log("This is the y coordinate of the active player" + activePlayer.y);
+    console.log("This is the z coordinate of the activeplayer" + activePlayer.Z);
+})
+socket.on('disconnected', () => {
+    console.log('Disconnected from the socket/server');
+})
 socket.addEventListener('close', () => {
     console.log('Disconnected from server');
 });
-
 const world = new World(100, playerrecord);
 setInterval(() => world.tick(), world.pulse);
 setInterval(() => activePlayer.fullinfo(), 10000);

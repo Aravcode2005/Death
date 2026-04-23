@@ -1,6 +1,7 @@
 {
   "name": "echoes-of-oblivion",
   "version": "1.0.0",
+   "type":"commonjs",
   "description": "Hold  ur breath",
   "homepage": "https://github.com/Aravcode2005/Echoes-of-Oblivion#readme",
   "bugs": {
@@ -12,7 +13,6 @@
   },
   "license": "ISC",
   "author": "Aru",
-  "type": "commonjs",
   "main": "server.js",
   "scripts": {
     "start": "nodemon server.js"
@@ -28,8 +28,10 @@
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "flash": "^1.1.0",
+    "io": "^1.5.8",
     "mongoose": "^9.4.1",
     "nodemon": "^3.1.14",
+    "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3",
     "ws": "^8.20.0"
   }
