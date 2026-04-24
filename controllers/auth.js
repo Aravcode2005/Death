@@ -18,25 +18,13 @@ exports.getSignin = (req, res, next) => {
             email: ' ',
             password: ' '
         },
-      validationErrors:[]
+        validationErrors: []
     });
 }
 exports.postSignin = async (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.Pswd;
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(422).render('signin', {
-                path: '/signin',
-                pageTitle: 'Signin',
-                errorMessage: errors.array()[0].msg,
-                oldInput: {
-                    email: email,
-                    password: password
-                }
-            })
-        }
         const user = await userdata.findOne({ email: email });
         if (!user) {
             req.flash('error', 'Invalid Email or password');
@@ -46,6 +34,8 @@ exports.postSignin = async (req, res, next) => {
         if (doMatch) {
             req.session.isLoggedIn = true;
             req.session.user = user;
+            req.session.email = email;
+            console.log("User is Logged in" + req.session.user);
             return res.redirect('/EchoesOfOblivion');
         } else {
             req.flash('error', 'Invalid Email or Password');
@@ -55,6 +45,19 @@ exports.postSignin = async (req, res, next) => {
         console.log(error);
         res.redirect('/signin');
     }
+}
+exports.getMainScene = (req, res, next) => {
+    if (req.session.isLoggedIn) {
+        res.render('mainScene', {
+            pageTitle: "mainScene",
+            username: req.session.username
+        })
+    }
+    else if (!req.session.isLoggedIn) {
+        console.log('User not authenticated');
+        return res.redirect('/');
+    }
+
 }
 exports.getSignup = (req, res, next) => {
     res.render("signup", {
@@ -67,14 +70,15 @@ exports.postSignup = async (req, res, next) => {
         const email = req.body.email;
         const password = req.body.Pswd;
         const hashedpassword = await bcrypt.hash(password, 15);
-        userdata.insertOne({
+        await userdata.create({
             name: name,
             email: email,
             password: hashedpassword
-        })
+        });
         res.redirect('/signin');
     }
     catch (error) {
-        console.log(error);
+        console.error('Signup error:', error);
+        res.redirect('/signup');
     }
 }

@@ -4,26 +4,12 @@ const socket = io("http://localhost:3000");
 Scene.background = new THREE.Color(0x262626);
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 Scene.add(ambientLight);
-
 const PerspectiveCamera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
     1000
-);
-class Player {
-    Name;
-    Era;
-    Position;
-    constructor(name, era, position) {
-        this.Name = name;
-        this.Era = era;
-        this.Position = position;
-    }
-    lifeeventlogs() {
-        console.log("Gathering the info......" + "name->" + this.Name + "Era->" + this.Era + "Position" + this.Position);
-    }
-}
+);  
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 32, 32), new THREE.MeshStandardMaterial({
     roughness: 0.9,
     color: 0x7cb342
@@ -45,7 +31,6 @@ class Playeractions extends Player {
     moveBackward = false;
     rotate = false;
     movementdynamics = [];
-
     constructor(name, era, position, X, Y, Z, Color, arr = [], Theta) {
         super(name, era, position);
         this.x = X;
@@ -92,8 +77,6 @@ class World {
             }
             p.movementdynamics.push([p.x, p.y, p.Z]);
         }
-
-
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify({
                 id: activePlayer.Name,
@@ -114,7 +97,6 @@ class Ghost {
     color;
     roughness;
     movementarray;
-
     index = 0;
     constructor(name, x, y, z, h, l, b, color, roughness, ghostpath) {
         this.movementarray = ghostpath;
@@ -141,7 +123,6 @@ class Ghost {
 
     follow() {
         if (this.movementarray.length === 0) return;
-
         const latest = this.movementarray.length - 1;
         const target = new THREE.Vector3(...this.movementarray[latest]);
         this.spirit.position.lerp(target, 0.5);
@@ -221,3 +202,4 @@ function animate() {
     renderer.render(Scene, PerspectiveCamera);
 }
 animate();
+

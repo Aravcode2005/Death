@@ -1,20 +1,21 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const socketIo = require('socket.io');
 const http = require('http');
 const server = http.createServer(app);
+const io = socketIo(server);
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const session = require('express-session');
 const flash = require('connect-flash');
-require('./util/database');
+const ConnectDB = require('./util/database');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({
     secret: 'my secret',
     resave: false,
     saveUninitialized: false,
 }))
-app.use(flash());
 app.use(flash());
 app.get('/', (req, res, next) => {
     res.render('Eco', {
@@ -33,11 +34,6 @@ app.get('/EchoesOfOblivion', (req, res, next) => {
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('/mainScene', (req, res, next) => {
-    res.render('mainScene', {
-        pageTitle: "mainScene"
-    })
-})
 app.get('/sea', (req, res, next) => {
     res.render("Sea", {
         pageTitle: "seaScene"
@@ -49,15 +45,18 @@ app.get('/heartBeat', (req, res, next) => {
     })
 })
 app.use(authRoutes);
-const ws = require('ws');
-const { Session } = require('inspector');
-const wss = new ws.Server({ server });
-wss.on('connection', socket => {
-    let id = toString(Math.random() * 100);
-    socket.on('message', msg => {
-        socket.send(`Echo:${msg}`);
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    socket.on('message', (data) => {
+        console.log('Message received:', data);
+        socket.emit('response', 'Message received');
     });
-    socket.on('close', () => console.log('Client disconnected'));
+    socket.on('disconnect', () => console.log('User disconnected'));
 });
-server.listen(3000, () => console.log("http://localhost:3000"));
+ConnectDB.then(() => {
+    server.listen(3000, () => console.log("http://localhost:3000"));
+}).catch(err => {
+    console.log("Error found in connecting ");
+})
+
 
