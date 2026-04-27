@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 dotenv.config();
 exports.getSignin = (req, res, next) => {
+
+
     let message = req.flash('error');
     if (message.length > 0) {
         message = message[0];
@@ -32,11 +34,13 @@ exports.postSignin = async (req, res, next) => {
         }
         const doMatch = await bcrypt.compare(password, user.password);
         if (doMatch) {
+            console.log("Session" + req.session.id);
             req.session.isLoggedIn = true;
             req.session.user = user;
+            req.session.username = user.name;
             req.session.email = email;
             console.log("User is Logged in" + req.session.user);
-            return res.redirect('/EchoesOfOblivion');
+            return res.redirect('/mainScene');
         } else {
             req.flash('error', 'Invalid Email or Password');
             return res.redirect('/signin');
@@ -44,6 +48,14 @@ exports.postSignin = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         res.redirect('/signin');
+    }
+}
+exports.isAuthenticated = (req, res, next) => {
+    if (req.session && req.session.isLoggedIn) {
+        return next();
+    }
+    else {
+        return res.redirect('/signin');
     }
 }
 exports.getMainScene = (req, res, next) => {
@@ -57,7 +69,15 @@ exports.getMainScene = (req, res, next) => {
         console.log('User not authenticated');
         return res.redirect('/');
     }
-
+}
+exports.postLogout = (req, res, next) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return console.log(err);
+        }
+        console.log("Destroying the current session");
+        res.redirect('/');
+    });
 }
 exports.getSignup = (req, res, next) => {
     res.render("signup", {

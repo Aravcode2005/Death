@@ -11,8 +11,12 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ConnectDB = require('./util/database');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
+const dotenv=require('dotenv');
+dotenv.config();
+
 app.use(session({
-    secret: 'my secret',
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
 }))

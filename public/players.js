@@ -9,14 +9,24 @@ const PerspectiveCamera = new THREE.PerspectiveCamera(
     window.innerWidth / window.innerHeight,
     0.1,
     1000
-);  
+);
 const floor = new THREE.Mesh(new THREE.PlaneGeometry(200, 200, 32, 32), new THREE.MeshStandardMaterial({
     roughness: 0.9,
     color: 0x7cb342
-  })
+})
 );
 floor.rotation.x = -Math.PI / 2;
 Scene.add(floor);
+class Player {
+    name;
+    era;
+    position;
+    constructor(name, era, position) {
+        this.name = name;
+        this.era = era;
+        this.position = position;
+    }
+}
 class Playeractions extends Player {
     x = 0;
     y = 0;
@@ -78,7 +88,7 @@ class World {
             p.movementdynamics.push([p.x, p.y, p.Z]);
         }
         if (socket.readyState === WebSocket.OPEN) {
-            socket.send(JSON.stringify({
+            socket.emit(JSON.stringify({
                 id: activePlayer.Name,
                 positions: [activePlayer.x, activePlayer.y, activePlayer.Z],
             }));
@@ -102,6 +112,7 @@ class Ghost {
         this.movementarray = ghostpath;
         this.h = h;
         this.l = l;
+        this.b=  b;
         this.color = color;
         this.roughness = roughness;
         this.name = name;
@@ -158,7 +169,6 @@ document.addEventListener("keydown", (event) => {
         activePlayer = playerrecord[Number(key) - 1];
         return;
     }
-
     if (keyMap[key] !== undefined) {
         activePlayer[keyMap[key]] = true;
     }
@@ -175,7 +185,7 @@ socket.on('connect', () => {
     console.log("This is the y coordinate of the active player" + activePlayer.y);
     console.log("This is the z coordinate of the activeplayer" + activePlayer.Z);
 })
-socket.on('disconnected', () => {
+socket.on('disconnect', () => {
     console.log('Disconnected from the socket/server');
 })
 socket.addEventListener('close', () => {
