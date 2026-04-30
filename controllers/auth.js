@@ -4,8 +4,6 @@ const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 dotenv.config();
 exports.getSignin = (req, res, next) => {
-
-
     let message = req.flash('error');
     if (message.length > 0) {
         message = message[0];
@@ -39,9 +37,11 @@ exports.postSignin = async (req, res, next) => {
             req.session.user = user;
             req.session.username = user.name;
             req.session.email = email;
+            req.session.photo=photo;
             console.log("User is Logged in" + req.session.user);
-            return res.redirect('/mainScene');
-        } else {
+            return res.redirect('/user');//yeh jo user vala page hai hum isme current user jo session me configured hai ek page pe new game load karenge aur doosre page pe uski saari details load karenge 
+        } 
+        else {
             req.flash('error', 'Invalid Email or Password');
             return res.redirect('/signin');
         }
@@ -50,6 +50,7 @@ exports.postSignin = async (req, res, next) => {
         res.redirect('/signin');
     }
 }
+
 exports.isAuthenticated = (req, res, next) => {
     if (req.session && req.session.isLoggedIn) {
         return next();
@@ -58,6 +59,8 @@ exports.isAuthenticated = (req, res, next) => {
         return res.redirect('/signin');
     }
 }
+//make 
+//THEN I SHOULD MAKE THE PROTECTED ROUTES AS THE USERROUTES 
 exports.getMainScene = (req, res, next) => {
     if (req.session.isLoggedIn) {
         res.render('mainScene', {
@@ -89,11 +92,30 @@ exports.postSignup = async (req, res, next) => {
         const name = req.body.Name;
         const email = req.body.email;
         const password = req.body.Pswd;
-        const hashedpassword = await bcrypt.hash(password, 15);
+        const image = req.file;
+        if(!image){
+            return res.status(422).render('error')={
+            pageTitle:'Error',
+            message:'Some error occured we are trying to fix it'
+            }
+        }
+        const imageUrl=image.path;
+        const dupname = await userdata.findOne({ name: name });
+        if (dupname) {
+            console.log("Username already exists");
+            res.redirect('/signup');
+        }
+        const dupmail = await userdata.findOne({ email: email });
+        if (dupmail) {
+            req.flash("Email id already exists ,signin to continue");
+            res.redirect('/signin');
+        }
+        const hashedpassword = await bcrypt.hash(password, 20);
         await userdata.create({
             name: name,
             email: email,
-            password: hashedpassword
+            password: hashedpassword,
+            img: imageUrl
         });
         res.redirect('/signin');
     }

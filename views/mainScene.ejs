@@ -12,10 +12,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="/players.js"></script>
+<form method="POST" id="logout" name="logout" action="/mainScene">
+<button type="submit" id="exit" name="exit" >Exit </button>
 <p><%=username%></p>
-<form method="POST" name="Logout" id="logout" action="/Logout">
-
-<button type="submit" name="Exit" id="Exit" "> Exit </button>
-</form>
 </body>
 </html>

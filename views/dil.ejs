@@ -2,11 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width ,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%=pageTitle%></title>
+<link href="/css/scene.css" rel="stylesheet"/>
 </head>
 <body>
-<canvas id="gameCanvas">gameCanvas</canvas>
-<script src="/heartbeat.js"></script>
+  <div class="page-shell">
+    <header class="navbar">
+      <div class="brand">Dil Pathway</div>
+      <div class="status-badge">Heartbeat Mode</div>
+    </header>
+    <section class="canvas-shell">
+      <div class="canvas-overlay"></div>
+      <canvas id="gameCanvas">gameCanvas</canvas>
+      <div class="info-block">
+        <p><strong>Pulse Sync:</strong> Feel the world respond to the rhythm of your code.</p>
+      </div>
+    </section>
+  </div>
+  <script src="/heartbeat.js"></script>
 </body>
 </html>

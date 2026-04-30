@@ -2,27 +2,37 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width ,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%=pageTitle%></title>
 <link href="/css/scene.css" rel="stylesheet"/>
 </head>
 <body>
-<div class ="controls">
-<form method="POST" action="/signup" id="userCredentials" name="userCredentials">
-    <p>
-   <input type="text" name="Name" id="Name" placeholder="Enter your name">
-   </input>
-   </p>
-     <p>
-   <input type="text" name="email" id="email" placeholder="Enter your email">
-   </input>
-   </p>
-    <p>
-   <input type="password" name="Pswd" id="Pswd" placeholder="Enter your password">
-   </input>
-   </p>
-  <button  type="submit" id="save" name="save">Confirm your registration</button>
-  </form>
-</div>
+  <div class="page-shell">
+    <section class="hero">
+      <div class="panel glow-panel">
+        <div class="logo">Echoes of Oblivion</div>
+        <p class="tagline">Join the academy of the forgotten. Create your avatar and step into an anime-inspired landscape of mystery.</p>
+        <div class="form-grid">
+          <form method="POST" action="/signup" id="userCredentials" name="userCredentials" enctype="multipart/form-data">
+            <div class="form-grid">
+              <label for="Name">Hero Name</label>
+              <input class="input-glow" type="text" name="Name" id="Name" placeholder="Enter your name" required>
+              <label for="email">Email</label>
+              <input class="input-glow" type="email" name="email" id="email" placeholder="Enter your email" required>
+              <label for="Pswd">Password</label>
+              <input class="input-glow" type="password" name="Pswd" id="Pswd" placeholder="Enter your password" required>
+              <label for ="Photo">Photo</label>
+            <input class="input-glow" type="file" name="image" id="image" required >
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit" id="save" name="save">Confirm Registration</button>
+              <button class="btn btn-secondary" type="button" onclick="location.href='/signin'">Already a Traveler?</button>
+            </div>
+          </form>
+        </div>
+        <p class="footer-note">Your data is protected by ancient seals. Welcome to the voyage.</p>
+      </div>
+    </section>
+  </div>
 </body>
 </html>

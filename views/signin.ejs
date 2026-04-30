@@ -2,23 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width ,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><%=pageTitle%></title>
 <link href="/css/scene.css" rel="stylesheet"/>
 </head>
 <body>
-<div class ="controls">
-<form method="POST" action="/signin" id="userCredentials" name="userCredentials">
-    <p>
-   <input type="email" name="email" id="email" placeholder="Enter your email">
-   </input>
-      </p>
-    <p>
-   <input type="password" name="Pswd" id="Pswd" placeholder="Enter your password">
-   </input>
-   </p>
-  <button  type="submit" id="save" name="save"> Enter </button>
-  </form>
-</div>
+  <div class="page-shell">
+    <section class="hero">
+      <div class="panel glow-panel">
+        <div class="logo">Echoes of Oblivion</div>
+        <p class="tagline">Sign in to continue your journey into the lost realm. Your legend awaits beyond the shimmering gate.</p>
+        <div class="form-grid">
+          <form method="POST" action="/signin" id="userCredentials" name="userCredentials">
+            <div class="form-grid">
+              <label for="email">Email</label>
+              <input class="input-glow" type="email" name="email" id="email" placeholder="Enter your email" required>
+              <label for="Pswd">Password</label>
+              <input class="input-glow" type="password" name="Pswd" id="Pswd" placeholder="Enter your password" required>
+            </div>
+            <div class="form-actions">
+              <button class="btn btn-primary" type="submit" id="save" name="save">Enter the Realm</button>
+              <button class="btn btn-secondary" type="button" onclick="location.href='/signup'">Create Account</button>
+            </div>
+          </form>
+        </div>
+        <p class="footer-note">Need help? Contact support or return to the landing page.</p>
+      </div>
+    </section>
+  </div>
 </body>
 </html>

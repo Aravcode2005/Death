@@ -6,5 +6,5 @@ router.post('/signup', authController.postSignup);
 router.get('/signin', authController.getSignin);
 router.post('/signin', authController.postSignin);
 router.get('/mainScene',authController.isAuthenticated,authController.getMainScene);//Protected Route now this route is not acessible to every user only the authorized users are allowed to enter 
-router.post('/Logout',authController.postLogout);
+router.post('/mainScene',authController.postLogout);
 module.exports = router;

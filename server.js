@@ -7,14 +7,32 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
+const userRoutes=require('./routes/user');
 const session = require('express-session');
 const flash = require('connect-flash');
-const ConnectDB = require('./util/database');
+const multer=require('multer');
 app.use(bodyParser.urlencoded({ extended: false }));
+const fileStorage=multer.diskStorage({
+    destination:(req,file,cb)=>{
+        cb(null,'images');
+    },
+    filename:(req,file,cb)=>{
+        cb(null,new Date().toISOString()+'-'+file.originalname);
+    }
+});
+const fileFilter=(req,file,cb)=>{
+    if(file.mimetype==='image/png'||file.mimetype==='image/jpg'||file.mimetype==='image/jpeg'){
+        cb(null,true);
+    }
+    else{
+        cb(null,false);
+    }
+};
+app.use(multer({storage:fileStorage}).single('image'));
 app.use(express.json());
 const dotenv=require('dotenv');
 dotenv.config();
-
+const ConnectDB=require('./util/database');
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
@@ -49,6 +67,7 @@ app.get('/heartBeat', (req, res, next) => {
     })
 })
 app.use(authRoutes);
+app.use(userRoutes);
 io.on('connection', (socket) => {
     console.log('A user connected');
     socket.on('message', (data) => {

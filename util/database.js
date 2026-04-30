@@ -10,6 +10,7 @@ const mongoOptions = {
     minPoolSize: 2,
     retryWrites: true
 };
+
 const ConnectDB=mongoose.connect(process.env.MONGO_DB_URI, mongoOptions)
     .then(() => console.log("Connected to the database"))
     .catch(err => {
