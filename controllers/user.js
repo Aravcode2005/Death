@@ -6,14 +6,29 @@ exports.getuserpage = (req, res, next) => {
     })
 }
 exports.postuserpage = (req, res, next) => {
-    res.redirect('/mainScene');
+    const { action } = req.body;
+    try {
+        if (action === "profile") {
+            res.redirect('/profile');
+        }
+        if (action === "game") {
+            res.redirect('/mainScene');
+        }
+
+        else{
+            res.redirect('/user');
+        }
+    }
+    catch (error) {
+        console.log("Error detected" + error);
+    }
 }
 exports.getProfile = (req, res, next) => {
     res.render('profile', {
         pageTitle: "profile",
         personname: req.session.username,
         personemail: req.session.email,
-        personpassword: req.session.password,
+        personpassword: req.session.password, 
         personimage:req.session.photo,
     })
 }

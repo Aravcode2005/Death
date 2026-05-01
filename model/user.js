@@ -1,14 +1,13 @@
 const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
-
 const userSchema = new Schema({
     name: String,
     email: String,
     password: String,
-    img:{
-    data:Buffer,
-    contentType:String
-    },
+     imageUrl:{
+      type:String,
+      required:true
+     },
     position: [Number],
     color: String
 }, {
