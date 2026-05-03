@@ -36,7 +36,7 @@ dotenv.config();
 const ConnectDB = require('./util/database');
 app.use(session({
     secret: process.env.SESSION_SECRET,
-    resave: false,
+    resave: true,
     saveUninitialized: false,
 }))
 app.use(flash());

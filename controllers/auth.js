@@ -26,7 +26,7 @@ exports.postSignin = async (req, res, next) => {
         const email = req.body.email;
         const password = req.body.Pswd;
         const user = await userdata.findOne({ email: email });
-        const img=req.body.imageUrl;
+        const img = req.body.imageUrl;
         if (!user) {
             req.flash('error', 'Invalid Email or password');
             return res.redirect('/signin');
@@ -38,7 +38,7 @@ exports.postSignin = async (req, res, next) => {
             req.session.user = user;
             req.session.username = user.name;
             req.session.email = email;
-            req.session.photo=user.imageUrl;
+            req.session.photo = user.imageUrl;
             console.log("User is Logged in" + req.session.user);
             return res.redirect('/user');//yeh jo user vala page hai hum isme current user jo session me configured hai ek page pe new game load karenge aur doosre page pe uski saari details load karenge 
         }

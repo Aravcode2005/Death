@@ -48,7 +48,7 @@ class Playeractions extends Player {
         this.Z = Z;
         this.theta = Theta;
         this.color = Color;
-        this.movementdynamics = arr;
+        this.movementdynamics = [[X,Y,Z]];
         this.player = new THREE.Mesh(
             new THREE.BoxGeometry(1, 2, 3),
             new THREE.MeshStandardMaterial({ color: this.color, roughness: 0.9 })
@@ -56,40 +56,129 @@ class Playeractions extends Player {
         this.player.position.set(X, Y, Z);
         Scene.add(this.player);
     }
-
     fullinfo() {
-        console.log(this.Name, this.Era, this.Position, this.movementdynamics);
+        console.log(this.name, this.era, this.position, this.movementdynamics);
     }
+}
+
+//at each point or on each change show the movement dynamics to the server 
+const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xff0000, [], 45);
+const player2 = new Playeractions("Zeus", "Medieval", "Warrior", 0, 0, 0, 0x00ff00, [], 45);
+const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x0000ff, [], 45);
+const player4 = new Playeractions("Xong", "Past", "Monk", 10, -10, 0, 0xff0000, [], 45);
+const player5 = new Playeractions("Zous", "Medieval", "Warrior", 20, 0, 0, 0x00ff00, [], 45);
+const player6 = new Playeractions("Alegx", "Future", "Engineer", 15, 10, 0, 0x0000ff, [], 45);
+const playerrecord = [player1, player2, player3, player4, player5, player6];
+let activePlayer = player1;
+function willCollide(pos = [], movementdynamics) {
+    if (movementdynamics.length === 0) {
+        return 0;
+    }
+    const latest = movementdynamics[movementdynamics.length - 1];
+    return (
+        (Math.abs(pos[0] - latest[0]) <= 1 && Math.abs(pos[1] - latest[1]) <= 1 && Math.abs(pos[2] - latest[2]) <= 1)
+    )
 }
 class World {
     pulse;
     playerList = [];
-
     constructor(heartPulse, Players = []) {
         this.pulse = heartPulse;
         this.playerList = Players;
     }
-
     tick() {
         for (let i = 0; i < this.playerList.length; i++) {
             let p = this.playerList[i];
-            if (p.moveRight) p.x++;
-            if (p.moveLeft) p.x--;
-            if (p.moveForward) p.Z--;
-            if (p.moveBackward) p.Z++;
-            if (p.moveUp) p.y++;
-            if (p.moveDown) p.y--;
+            if (p.moveRight) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.x++;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
+                }
+            }
+            if (p.moveLeft) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.x--;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
 
+                }
+            }
+            if (p.moveForward) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.Z--;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
+
+                }
+            }
+            if (p.moveBackward) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.Z++;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
+                }
+            }
+            if (p.moveUp) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.y++;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
+                }
+            }
+            if (p.moveDown) {
+                for (let i = 1; i <= 6; i++) {
+                    if (playerrecord[i - 1] === p) {
+                        continue;
+                    }
+                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
+                        p.y--;
+                    }
+                    else {
+                        console.log("Colliding between current player and " + i + "th player");
+                    }
+                }
+            }
             p.player.position.set(p.x, p.y, p.Z);
-
-            if (p.movementdynamics.length > 100) {
+            if (p.movementdynamics.length > 3) {
                 p.movementdynamics.shift();
             }
             p.movementdynamics.push([p.x, p.y, p.Z]);
         }
-        if (socket.readyState === WebSocket.OPEN) {
+        if (socket.connected) {
             socket.emit(JSON.stringify({
-                id: activePlayer.Name,
+                id: activePlayer.name,
                 positions: [activePlayer.x, activePlayer.y, activePlayer.Z],
             }));
         }
@@ -97,7 +186,6 @@ class World {
         ghosts.forEach(g => g.follow());
     }
 }
-
 class Ghost {
     name;
     ghostx = 0;
@@ -112,7 +200,7 @@ class Ghost {
         this.movementarray = ghostpath;
         this.h = h;
         this.l = l;
-        this.b=  b;
+        this.b = b;
         this.color = color;
         this.roughness = roughness;
         this.name = name;
@@ -139,21 +227,13 @@ class Ghost {
         this.spirit.position.lerp(target, 0.5);
     }
 }
-const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xff0000, [], 45);
-const player2 = new Playeractions("Zeus", "Medieval", "Warrior", 0, 0, 0, 0x00ff00, [], 45);
-const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x0000ff, [], 45);
-const player4 = new Playeractions("Xong", "Past", "Monk", 10, -10, 0, 0xff0000, [], 45);
-const player5 = new Playeractions("Zous", "Medieval", "Warrior", 20, 0, 0, 0x00ff00, [], 45);
-const player6 = new Playeractions("Alegx", "Future", "Engineer", 15, 10, 0, 0x0000ff, [], 45);
-const ghostplayer1 = new Ghost(player1.Name, 0, 0, 0, 1, 2, 3, player1.color, 0.9, player1.movementdynamics);
-const ghostplayer2 = new Ghost(player2.Name, 0, 0, 0, 1, 2, 3, player2.color, 0.9, player2.movementdynamics);
-const ghostplayer3 = new Ghost(player3.Name, 0, 0, 0, 1, 2, 3, player3.color, 0.9, player3.movementdynamics);
-const ghostplayer4 = new Ghost(player4.Name, 0, 0, 0, 1, 2, 3, player4.color, 0.9, player4.movementdynamics);
-const ghostplayer5 = new Ghost(player5.Name, 0, 0, 0, 1, 2, 3, player5.color, 0.9, player5.movementdynamics);
-const ghostplayer6 = new Ghost(player6.Name, 0, 0, 0, 1, 2, 3, player6.color, 0.9, player6.movementdynamics);
+const ghostplayer1 = new Ghost(player1.name, 0, 0, 0, 1, 2, 3, player1.color, 0.9, player1.movementdynamics);
+const ghostplayer2 = new Ghost(player2.name, 0, 0, 0, 1, 2, 3, player2.color, 0.9, player2.movementdynamics);
+const ghostplayer3 = new Ghost(player3.name, 0, 0, 0, 1, 2, 3, player3.color, 0.9, player3.movementdynamics);
+const ghostplayer4 = new Ghost(player4.name, 0, 0, 0, 1, 2, 3, player4.color, 0.9, player4.movementdynamics);
+const ghostplayer5 = new Ghost(player5.name, 0, 0, 0, 1, 2, 3, player5.color, 0.9, player5.movementdynamics);
+const ghostplayer6 = new Ghost(player6.name, 0, 0, 0, 1, 2, 3, player6.color, 0.9, player6.movementdynamics);
 const ghosts = [ghostplayer1, ghostplayer2, ghostplayer3, ghostplayer4, ghostplayer5, ghostplayer6];
-const playerrecord = [player1, player2, player3, player4, player5, player6];
-let activePlayer = player1;
 const keyMap = {
     'u': 'moveUp',
     'd': 'moveDown',
@@ -166,7 +246,9 @@ const keyMap = {
 document.addEventListener("keydown", (event) => {
     const key = event.key.toLowerCase();
     if (key >= '1' && key <= '6') {
+        console.log("Key pressed!");
         activePlayer = playerrecord[Number(key) - 1];
+        console.log("The active player is" + playerrecord[Number(key) - 1]);
         return;
     }
     if (keyMap[key] !== undefined) {
@@ -181,9 +263,15 @@ document.addEventListener("keyup", (event) => {
 });
 socket.on('connect', () => {
     console.log("Connected", socket.id);
-    console.log("This is X coordinate of the current player" + activePlayer.x);
-    console.log("This is the y coordinate of the active player" + activePlayer.y);
-    console.log("This is the z coordinate of the activeplayer" + activePlayer.Z);
+    console.log("This is X coordinate of the current player", activePlayer.x);
+    console.log("This is the y coordinate of the active player", activePlayer.y);
+    console.log("This is the z coordinate of the activeplayer", activePlayer.Z);
+    console.log("The coordinates of the player 1", player1.movementdynamics);
+    console.log("The coordinates of the second player 2", player2.movementdynamics);
+    console.log("The coordinates of the player 3 ", player3.movementdynamics);
+    console.log("The coordinates of the player 4", player4.movementdynamics);
+    console.log("The coordinates of the player 5", player5.movementdynamics);
+    console.log("The coordinates of the player 6", player6.movementdynamics);
 })
 socket.on('disconnect', () => {
     console.log('Disconnected from the socket/server');
@@ -212,4 +300,5 @@ function animate() {
     renderer.render(Scene, PerspectiveCamera);
 }
 animate();
+//For collision we need the current coordinates of each player not just the active player
 
