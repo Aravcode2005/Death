@@ -48,7 +48,7 @@ class Playeractions extends Player {
         this.Z = Z;
         this.theta = Theta;
         this.color = Color;
-        this.movementdynamics = [[X,Y,Z]];
+        this.movementdynamics = [[X, Y, Z]];
         this.player = new THREE.Mesh(
             new THREE.BoxGeometry(1, 2, 3),
             new THREE.MeshStandardMaterial({ color: this.color, roughness: 0.9 })
@@ -61,7 +61,6 @@ class Playeractions extends Player {
     }
 }
 
-//at each point or on each change show the movement dynamics to the server 
 const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xff0000, [], 45);
 const player2 = new Playeractions("Zeus", "Medieval", "Warrior", 0, 0, 0, 0x00ff00, [], 45);
 const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x0000ff, [], 45);
@@ -70,13 +69,11 @@ const player5 = new Playeractions("Zous", "Medieval", "Warrior", 20, 0, 0, 0x00f
 const player6 = new Playeractions("Alegx", "Future", "Engineer", 15, 10, 0, 0x0000ff, [], 45);
 const playerrecord = [player1, player2, player3, player4, player5, player6];
 let activePlayer = player1;
-function willCollide(pos = [], movementdynamics) {
-    if (movementdynamics.length === 0) {
-        return 0;
-    }
-    const latest = movementdynamics[movementdynamics.length - 1];
+function willCollide(pos, other) {
     return (
-        (Math.abs(pos[0] - latest[0]) <= 1 && Math.abs(pos[1] - latest[1]) <= 1 && Math.abs(pos[2] - latest[2]) <= 1)
+        (Math.abs(pos[0] - other.x) < 1 &&
+            Math.abs(pos[1] - other.y) < 2 &&
+            Math.abs(pos[2] - other.Z) < 3)
     )
 }
 class World {
@@ -90,84 +87,106 @@ class World {
         for (let i = 0; i < this.playerList.length; i++) {
             let p = this.playerList[i];
             if (p.moveRight) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x + 1, p.y, p.Z];
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.x++;
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
+
+                }
+
+                if (canMove) {
+                    p.x++;
                 }
             }
             if (p.moveLeft) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x - 1, p.y, p.Z];
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.x--;
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
-
+                }
+                if (canMove) {
+                    p.x--;
                 }
             }
             if (p.moveForward) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x, p.y, p.Z - 1];
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
 
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.Z--;
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
+                }
 
+                if (canMove) {
+                    p.Z--;
                 }
             }
             if (p.moveBackward) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x, p.y, p.Z + 1];
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.Z++;
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
+
+                }
+                if (canMove) {
+                    p.Z++;
                 }
             }
             if (p.moveUp) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x, p.y + 1, p.Z];
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.y++;
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
+                }
+
+                if (canMove) {
+                    p.y++;
                 }
             }
             if (p.moveDown) {
-                for (let i = 1; i <= 6; i++) {
-                    if (playerrecord[i - 1] === p) {
+                let nextpos = [p.x, p.y - 1, p.Z]
+                let canMove = true;
+                for (let other of this.playerList) {
+                    if (other === p) {
                         continue;
                     }
-                    if (!willCollide([p.x, p.y, p.Z], playerrecord[i - 1].movementdynamics)) {
-                        p.y--;
+
+                    if (willCollide(nextpos, other)) {
+                        canMove = false;
+                        break;
                     }
-                    else {
-                        console.log("Colliding between current player and " + i + "th player");
-                    }
+                }
+                if (canMove) {
+                    p.y--;
                 }
             }
             p.player.position.set(p.x, p.y, p.Z);
