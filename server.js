@@ -11,7 +11,10 @@ const userRoutes = require('./routes/user');
 const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
-const cookieParser=require('cookie-parser');
+const MongoStore = require('connect-mongo');
+const cookieParser = require('cookie-parser');
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 const fileStorage = multer.diskStorage({
@@ -19,7 +22,7 @@ const fileStorage = multer.diskStorage({
         cb(null, 'images');
     },
     filename: (req, file, cb) => {
-        cb(null,Date.now()+'-'+file.originalname);
+        cb(null, Date.now() + '-' + file.originalname);
     }
 });
 
@@ -38,18 +41,17 @@ dotenv.config();
 const ConnectDB = require('./util/database');
 app.use(session({
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: false,
+    resave: false,
+    saveUninitialized: false
 }))
 app.use(flash());
 app.get('/', (req, res, next) => {
-    console.log('Cookies:',JSON.stringify(req.cookies));
+    console.log('Cookies:', JSON.stringify(req.cookies));
     res.render('Eco', {
         pageTitle: "Echoes of Oblivion",
         junglelink: '/mainScene',
         sealink: '/sea'
     })
-    console.log('Signed Cookies:',JSON.stringify(req.signedCookies));
 })
 app.get('/EchoesOfOblivion', (req, res, next) => {
     res.render('Eco', {
@@ -58,10 +60,8 @@ app.get('/EchoesOfOblivion', (req, res, next) => {
         sealink: '/sea'
     })
 })
-app.set('view engine', 'ejs');
-app.set('views', 'views');
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/images',express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(__dirname, 'images')));
 app.get('/sea', (req, res, next) => {
     res.render("Sea", {
         pageTitle: "seaScene"

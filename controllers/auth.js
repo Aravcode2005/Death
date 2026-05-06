@@ -3,6 +3,7 @@ const userdata = require('../model/user');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { options } = require('../routes/auth');
 dotenv.config();
 exports.getSignin = (req, res, next) => {
     let message = req.flash('error');
@@ -46,8 +47,8 @@ exports.postSignin = async (req, res, next) => {
                 role: "player"
             }
             const secretKey = process.env.JWT_SECRET;
-            const token = jwt.sign(payload, secretKey, { expiresIn: JWT_EXPIRES_IN });
-
+            const expiresIn = process.env.JWT_EXPIRES_IN;
+            const token = jwt.sign(payload, secretKey, { expiresIn });
             res.cookie('jwt', token, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -69,6 +70,22 @@ exports.postSignin = async (req, res, next) => {
     }
 }
 
+exports.verifyJwt = (req, res, next) => {
+    const token = req.cookies.jwt;
+    if (!token) {
+        return res.status(401).json({
+            message: 'JWT cookie  not found'
+        })
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.session.username = decoded.user;
+        next();
+    } catch (error) {
+        return res.status(403).json({ message: 'Invalid or expired token' });
+    }
+}
 exports.isAuthenticated = (req, res, next) => {
     if (req.session && req.session.isLoggedIn) {
         return next();
@@ -95,6 +112,7 @@ exports.postLogout = (req, res, next) => {
             return console.log(err);
         }
         console.log("Destroying the current session");
+        res.clearCookie('jwt');
         res.redirect('/');
     });
 }
@@ -134,12 +152,12 @@ exports.postSignup = async (req, res, next) => {
             }
             const dupmail = await userdata.findOne({ email: email });
             if (dupmail) {
-                req.flash("Email id already exists ,signin to continue");
+                req.flash('error', "Email id already exists ,signin to continue");
                 return res.redirect('/signin');
 
             }
             else {
-                const hashedpassword = await bcrypt.hash(password, 20);
+                const hashedpassword = await bcrypt.hash(password, 12);
                 await userdata.create({
                     name: name,
                     email: email,
