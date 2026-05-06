@@ -61,10 +61,10 @@ class Playeractions extends Player {
     }
 }
 
-const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xff0000, [], 45);
+const player1 = new Playeractions("Xing", "Past", "Monk", 0, -10, 0, 0xC94F74, [], 45);
 const player2 = new Playeractions("Zeus", "Medieval", "Warrior", 0, 0, 0, 0x00ff00, [], 45);
-const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x0000ff, [], 45);
-const player4 = new Playeractions("Xong", "Past", "Monk", 10, -10, 0, 0xff0000, [], 45);
+const player3 = new Playeractions("Alex", "Future", "Engineer", 0, 10, 0, 0x9367AB, [], 45);
+const player4 = new Playeractions("Xong", "Past", "Monk", 10, -10, 0, 0x9DAB67, [], 45);
 const player5 = new Playeractions("Zous", "Medieval", "Warrior", 20, 0, 0, 0x00ff00, [], 45);
 const player6 = new Playeractions("Alegx", "Future", "Engineer", 15, 10, 0, 0x0000ff, [], 45);
 const playerrecord = [player1, player2, player3, player4, player5, player6];
@@ -142,7 +142,7 @@ class World {
                 let nextpos = [p.x, p.y, p.Z + 1];
                 let canMove = true;
                 for (let other of this.playerList) {
-                    if (other === p) {
+                    if (other === p) { 
                         continue;
                     }
                     if (willCollide(nextpos, other)) {

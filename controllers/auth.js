@@ -2,6 +2,7 @@
 const userdata = require('../model/user');
 const dotenv = require('dotenv');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 dotenv.config();
 exports.getSignin = (req, res, next) => {
     let message = req.flash('error');
@@ -39,8 +40,24 @@ exports.postSignin = async (req, res, next) => {
             req.session.username = user.name;
             req.session.email = email;
             req.session.photo = user.imageUrl;
+            const payload = {
+                id: req.session.id,
+                user: req.session.username,
+                role: "player"
+            }
+            const secretKey = process.env.JWT_SECRET;
+            const token = jwt.sign(payload, secretKey, { expiresIn: JWT_EXPIRES_IN });
+
+            res.cookie('jwt', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 3600000,
+                path: '/'
+            })
+            console.log("JWT token generated:", token);
             console.log("User is Logged in" + req.session.user);
-            return res.redirect('/user');//yeh jo user vala page hai hum isme current user jo session me configured hai ek page pe new game load karenge aur doosre page pe uski saari details load karenge 
+            return res.redirect('/user');
         }
         else {
             req.flash('error', 'Invalid Email or Password');

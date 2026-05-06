@@ -11,7 +11,9 @@ const userRoutes = require('./routes/user');
 const session = require('express-session');
 const flash = require('connect-flash');
 const multer = require('multer');
+const cookieParser=require('cookie-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'images');
@@ -41,11 +43,13 @@ app.use(session({
 }))
 app.use(flash());
 app.get('/', (req, res, next) => {
+    console.log('Cookies:',JSON.stringify(req.cookies));
     res.render('Eco', {
         pageTitle: "Echoes of Oblivion",
         junglelink: '/mainScene',
         sealink: '/sea'
     })
+    console.log('Signed Cookies:',JSON.stringify(req.signedCookies));
 })
 app.get('/EchoesOfOblivion', (req, res, next) => {
     res.render('Eco', {

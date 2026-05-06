@@ -9,14 +9,14 @@ exports.postuserpage = (req, res, next) => {
     const { action } = req.body;
     try {
         if (action === "profile") {
-            res.redirect('/profile');
+            res.redirect(`/profile?tag=${req.session.username}`);
         }
         if (action === "game") {
-            res.redirect('/mainScene');
+            res.redirect(`/mainScene?tag=${req.session.id}`);
         }
 
-        else{
-            res.redirect('/user');
+        else {
+            res.redirect(`/user?tag=${req.session.username}`);
         }
     }
     catch (error) {
@@ -28,8 +28,8 @@ exports.getProfile = (req, res, next) => {
         pageTitle: "profile",
         personname: req.session.username,
         personemail: req.session.email,
-        personpassword: req.session.password, 
-        personimage:req.session.photo,
+        personpassword: req.session.password,
+        personimage: req.session.photo,
     })
 }
 
