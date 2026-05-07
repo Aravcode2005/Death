@@ -1,37 +1,658 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%=pageTitle%></title>
-  <link href="/css/scene.css" rel="stylesheet"/>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Echoes of Oblivion</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#050816;
+  --cyan:#00e5ff;
+  --purple:#8b5cf6;
+  --pink:#ff4fd8;
+  --text:#e8f7ff;
+  --dark:#0d1025;
+}
+
+body{
+  width:100%;
+  height:100vh;
+  overflow:hidden;
+  background:var(--bg);
+  font-family:'Press Start 2P', cursive;
+  image-rendering:pixelated;
+  color:white;
+  position:relative;
+}
+
+/* ===============================
+   PIXEL SKY
+=================================*/
+
+.sky{
+  position:absolute;
+  inset:0;
+
+  background:
+  radial-gradient(circle at top, rgba(139,92,246,0.35), transparent 35%),
+  radial-gradient(circle at bottom, rgba(0,229,255,0.18), transparent 40%),
+  linear-gradient(to bottom,#070816 0%,#0b1024 50%,#050816 100%);
+
+  animation:hueShift 12s infinite alternate ease-in-out;
+}
+
+@keyframes hueShift{
+  0%{
+    filter:hue-rotate(0deg);
+  }
+
+  100%{
+    filter:hue-rotate(20deg);
+  }
+}
+
+/* ===============================
+   GRID FLOOR
+=================================*/
+
+.grid-floor{
+  position:absolute;
+  bottom:-20%;
+  left:-10%;
+  width:120%;
+  height:55%;
+
+  background:
+  linear-gradient(rgba(0,229,255,0.18) 2px, transparent 2px),
+  linear-gradient(90deg, rgba(0,229,255,0.18) 2px, transparent 2px);
+
+  background-size:60px 60px;
+
+  transform:
+  perspective(700px)
+  rotateX(75deg);
+
+  opacity:0.35;
+}
+
+/* ===============================
+   PIXEL STARS
+=================================*/
+
+.stars{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+
+.star{
+  position:absolute;
+  width:4px;
+  height:4px;
+  background:white;
+  box-shadow:0 0 10px white;
+  animation:blink 2s infinite alternate;
+}
+
+@keyframes blink{
+  from{
+    opacity:0.2;
+  }
+
+  to{
+    opacity:1;
+  }
+}
+
+/* ===============================
+   SCANLINES
+=================================*/
+
+.scanlines{
+  position:absolute;
+  inset:0;
+
+  background:
+  repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+
+  pointer-events:none;
+  opacity:0.3;
+}
+
+/* ===============================
+   MAIN CONTAINER
+=================================*/
+
+.container{
+  width:100%;
+  height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  position:relative;
+  z-index:5;
+
+  padding:25px;
+}
+
+/* ===============================
+   PANEL
+=================================*/
+
+.panel{
+  width:min(1050px,100%);
+  padding:55px;
+
+  position:relative;
+
+  background:rgba(5,10,25,0.82);
+
+  border:4px solid var(--purple);
+
+  backdrop-filter:blur(12px);
+
+  box-shadow:
+  0 0 15px rgba(139,92,246,0.5),
+  0 0 40px rgba(0,229,255,0.25),
+  inset 0 0 25px rgba(255,255,255,0.03);
+
+  overflow:hidden;
+}
+
+/* pixel corners */
+
+.panel::before,
+.panel::after{
+  content:"";
+  position:absolute;
+  width:26px;
+  height:26px;
+  border:4px solid var(--cyan);
+}
+
+.panel::before{
+  top:10px;
+  left:10px;
+  border-right:none;
+  border-bottom:none;
+}
+
+.panel::after{
+  bottom:10px;
+  right:10px;
+  border-left:none;
+  border-top:none;
+}
+
+/* ===============================
+   TOP STATUS
+=================================*/
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  margin-bottom:45px;
+
+  font-size:0.6rem;
+  color:#8ff7ff;
+}
+
+.online{
+  color:#00ff95;
+  text-shadow:0 0 8px #00ff95;
+}
+
+/* ===============================
+   TITLE
+=================================*/
+
+.title{
+  font-size:4rem;
+  line-height:1.3;
+
+  margin-bottom:25px;
+
+  text-transform:uppercase;
+
+  color:white;
+
+  text-shadow:
+  0 0 10px var(--cyan),
+  0 0 25px var(--purple),
+  0 0 50px rgba(0,229,255,0.3);
+
+  animation:flicker 3s infinite alternate;
+}
+
+.title span{
+  color:var(--cyan);
+}
+
+@keyframes flicker{
+
+  0%,18%,22%,25%,53%,57%,100%{
+    opacity:1;
+  }
+
+  20%,24%,55%{
+    opacity:0.75;
+  }
+}
+
+/* ===============================
+   SUBTITLE
+=================================*/
+
+.subtitle{
+  max-width:800px;
+
+  color:#cdd6ff;
+
+  line-height:2.2;
+  font-size:0.72rem;
+
+  margin-bottom:45px;
+}
+
+/* ===============================
+   BUTTONS
+=================================*/
+
+.buttons{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+
+  margin-bottom:50px;
+}
+
+.pixel-btn{
+  position:relative;
+
+  border:none;
+  cursor:pointer;
+
+  padding:20px 24px;
+
+  font-family:'Press Start 2P', cursive;
+  font-size:0.65rem;
+
+  transition:0.15s ease;
+
+  overflow:hidden;
+}
+
+.pixel-btn:hover{
+  transform:translateY(-5px) scale(1.03);
+}
+
+.pixel-btn:active{
+  transform:scale(0.96);
+}
+
+.primary{
+  background:var(--purple);
+  color:white;
+
+  box-shadow:0 0 18px var(--purple);
+}
+
+.secondary{
+  background:var(--cyan);
+  color:#071018;
+
+  box-shadow:0 0 18px var(--cyan);
+}
+
+.ghost{
+  background:transparent;
+  border:3px solid white;
+  color:white;
+}
+
+/* animated shine */
+
+.pixel-btn::before{
+  content:"";
+  position:absolute;
+
+  top:0;
+  left:-120%;
+
+  width:100%;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+
+  transition:0.6s;
+}
+
+.pixel-btn:hover::before{
+  left:120%;
+}
+
+/* ===============================
+   FEATURE GRID
+=================================*/
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+}
+
+.card{
+  position:relative;
+
+  padding:25px;
+
+  background:rgba(255,255,255,0.03);
+
+  border:3px solid rgba(255,255,255,0.08);
+
+  transition:0.2s;
+}
+
+.card:hover{
+  transform:translateY(-7px);
+
+  border-color:var(--cyan);
+
+  box-shadow:
+  0 0 15px rgba(0,229,255,0.35);
+}
+
+.icon{
+  font-size:2rem;
+  margin-bottom:18px;
+}
+
+.card h3{
+  color:var(--cyan);
+
+  font-size:0.7rem;
+
+  margin-bottom:18px;
+}
+
+.card p{
+  color:#d6deff;
+
+  line-height:1.9;
+
+  font-size:0.55rem;
+}
+
+/* ===============================
+   FOOTER
+=================================*/
+
+.footer{
+  margin-top:45px;
+
+  border-top:2px solid rgba(255,255,255,0.08);
+
+  padding-top:22px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+
+  font-size:0.55rem;
+
+  color:#8c96d6;
+}
+
+/* ===============================
+   FLOATING ORBS
+=================================*/
+
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(50px);
+  opacity:0.35;
+  z-index:0;
+}
+
+.orb1{
+  width:250px;
+  height:250px;
+  background:#8b5cf6;
+
+  top:-80px;
+  right:-50px;
+
+  animation:float1 8s infinite ease-in-out;
+}
+
+.orb2{
+  width:220px;
+  height:220px;
+  background:#00e5ff;
+
+  bottom:-80px;
+  left:-50px;
+
+  animation:float2 10s infinite ease-in-out;
+}
+
+@keyframes float1{
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(25px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+}
+
+@keyframes float2{
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-20px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+}
+
+/* ===============================
+   RESPONSIVE
+=================================*/
+
+@media(max-width:850px){
+
+  body{
+    overflow:auto;
+  }
+
+  .container{
+    padding:18px;
+  }
+
+  .panel{
+    padding:30px;
+  }
+
+  .title{
+    font-size:2rem;
+  }
+
+  .buttons{
+    flex-direction:column;
+  }
+
+  .pixel-btn{
+    width:100%;
+  }
+
+  .topbar,
+  .footer{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:14px;
+  }
+
+}
+
+</style>
 </head>
+
 <body>
-  <div class="page-shell">
-    <section class="hero panel glow-panel">
-      <div class="logo">Echoes of Oblivion</div>
-      <p class="tagline">A neo-fantasy adventure wrapped in anime glow: uncover ancient ruins, command spectral forces, and shape your destiny.</p>
-      <div class="hero-buttons">
-        <button class="btn btn-primary" type="button" onclick="location.href='/signin'">Sign In</button>
-        <button class="btn btn-secondary" type="button" onclick="location.href='/signup'">Sign Up</button>
-        <button class="btn btn-ghost" type="button" onclick="location.href='/mainScene'">Enter the Realm</button>
+
+<div class="sky"></div>
+<div class="grid-floor"></div>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="stars" id="stars"></div>
+
+<div class="scanlines"></div>
+
+<div class="container">
+
+  <section class="panel">
+
+    <div class="topbar">
+      <div>✦ BUILD v0.9.7_ALPHA</div>
+      <div class="online">SYSTEM ONLINE</div>
+    </div>
+
+    <h1 class="title">
+      ECHOES OF<br>
+      <span>OBLIVION</span>
+    </h1>
+
+    <p class="subtitle">
+      Descend into forgotten neon ruins where spectral energy leaks through fractured dimensions.
+      Battle machine gods, awaken forbidden relics, and rewrite the final chapter of a collapsing world.
+    </p>
+
+    <div class="buttons">
+
+      <button class="pixel-btn primary"
+      onclick="location.href='/signin'">
+        ► SIGN IN
+      </button>
+
+      <button class="pixel-btn secondary"
+      onclick="location.href='/signup'">
+        ► CREATE ACCOUNT
+      </button>
+
+      <button class="pixel-btn ghost"
+      onclick="location.href='/mainScene'">
+        ► ENTER REALM
+      </button>
+
+    </div>
+
+    <div class="features">
+
+      <div class="card">
+        <div class="icon">⚔</div>
+        <h3>TACTICAL COMBAT</h3>
+        <p>
+          Precision combat against corrupted entities emerging from dimensional fractures.
+        </p>
       </div>
-      <div class="hero-details">
-        <div class="detail-card">
-          <span>✦</span>
-          <p>Immersive world-building</p>
-        </div>
-        <div class="detail-card">
-          <span>⚔️</span>
-          <p>Battle the unknown</p>
-        </div>
-        <div class="detail-card">
-          <span>🌊</span>
-          <p>Explore lost landscapes</p>
-        </div>
+
+      <div class="card">
+        <div class="icon">✦</div>
+        <h3>PIXEL WORLDS</h3>
+        <p>
+          Anime-inspired biomes glowing with retro-futuristic ruins and lost civilizations.
+        </p>
       </div>
-      <p class="footer-note">Start your expedition with a polished, cinematic interface built for the story.</p>
-    </section>
-  </div>
+
+      <div class="card">
+        <div class="icon">☾</div>
+        <h3>SPECTRAL POWERS</h3>
+        <p>
+          Channel forbidden relic energy to manipulate reality and bend combat systems.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="footer">
+      <div>NEURAL ARCHIVE LINK ESTABLISHED</div>
+      <div>© 2089 ECHO PROTOCOL</div>
+    </div>
+
+  </section>
+
+</div>
+
+<script>
+
+/* ==================================
+   RANDOM PIXEL STARS
+================================== */
+
+const starsContainer = document.getElementById("stars");
+
+for(let i = 0; i < 120; i++){
+
+  const star = document.createElement("div");
+
+  star.classList.add("star");
+
+  star.style.left = Math.random() * 100 + "%";
+  star.style.top = Math.random() * 100 + "%";
+
+  star.style.animationDelay = Math.random() * 3 + "s";
+
+  const size = Math.random() * 3 + 1;
+
+  star.style.width = size + "px";
+  star.style.height = size + "px";
+
+  starsContainer.appendChild(star);
+}
+
+</script>
+
 </body>
 </html>

@@ -25,7 +25,6 @@ const fileStorage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname);
     }
 });
-
 const fileFilter = (req, file, cb) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
         cb(null, true);
@@ -83,7 +82,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => console.log('User disconnected'));
 });
 ConnectDB.then(() => {
-    server.listen(3000, () => console.log("http://localhost:3000"));
+    server.listen(3003, () => console.log("http://localhost:3003"));
 }).catch(err => {
     console.log("Error found in connecting ");
 })
