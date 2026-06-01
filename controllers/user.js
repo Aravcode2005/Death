@@ -14,6 +14,7 @@ exports.postuserpage = (req, res, next) => {
         else if (action === "game") {
             res.redirect(`/mainScene?tag=${req.session.id}`);
         }
+
         else {
             res.redirect(`/user?tag=${JSON.stringify(req.session.username)}`);
         }
@@ -33,6 +34,15 @@ exports.getProfile = (req, res, next) => {
 
     })
 }
+
+
+
+
+
+
+    })
+}
+
 
 
 

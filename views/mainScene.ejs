@@ -28,6 +28,24 @@ html, body{
   font-family:var(--font-body);
 }
 
+
+<title><%=pageTitle%></title>
+
+<link href="/css/scene.css" rel="stylesheet"/>
+
+<style>
+
+/* =========================
+   BASE LAYERING
+
+body{
+  margin:0;
+  overflow:hidden;
+  background:black;
+  font-family: 'Press Start 2P', monospace;
+}
+
+
 #gameCanvas{
   position:fixed;
   inset:0;
@@ -327,6 +345,171 @@ html, body{
 }
 
 #chatForm button:hover{ background:rgba(168,255,62,0.15); }
+  z-index:1;
+}
+
+
+.scanlines{
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.03),
+    rgba(255,255,255,0.03) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events:none;
+  z-index:5;
+  opacity:0.25;
+}
+
+
+
+.vignette{
+  position:fixed;
+  inset:0;
+  background:radial-gradient(
+    circle at center,
+    transparent 40%,
+    rgba(0,0,0,0.65)
+  );
+  z-index:4;
+  pointer-events:none;
+}
+
+
+.hud{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:14px 18px;
+
+  z-index:10;
+
+  background:linear-gradient(
+    to bottom,
+    rgba(10,12,25,0.75),
+    transparent
+  );
+
+  color:#b8c1ff;
+  font-size:10px;
+}
+
+
+
+.user-tag{
+  padding:8px 12px;
+
+  border:1px solid #00e5ff;
+
+  color:#00e5ff;
+
+  box-shadow:0 0 10px rgba(0,229,255,0.4);
+
+  background:rgba(0,0,0,0.3);
+}
+
+
+.exit-form{
+  margin:0;
+}
+
+#exit{
+  background:linear-gradient(135deg,#ff3d7f,#8b5cf6);
+
+  border:none;
+
+  color:white;
+
+  font-family:inherit;
+
+  font-size:10px;
+
+  padding:10px 14px;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 0 15px rgba(255,61,127,0.5);
+
+  transition:0.2s ease;
+
+  position:relative;
+  overflow:hidden;
+}
+
+
+
+#exit::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:100%;
+  height:100%;
+
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+
+  transition:0.5s;
+}
+
+#exit:hover::before{
+  left:120%;
+}
+
+#exit:hover{
+  transform:translateY(-2px);
+}
+
+
+
+.corner{
+  position:fixed;
+  width:22px;
+  height:22px;
+  border:2px solid #00e5ff;
+  z-index:9;
+}
+
+.c1{top:10px;left:10px;border-right:none;border-bottom:none;}
+.c2{top:10px;right:10px;border-left:none;border-bottom:none;}
+.c3{bottom:10px;left:10px;border-right:none;border-top:none;}
+.c4{bottom:10px;right:10px;border-left:none;border-top:none;}
+
+
+.glow-orb{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(60px);
+  opacity:0.25;
+  z-index:2;
+}
+
+.o1{
+  width:220px;height:220px;
+  background:#8b5cf6;
+  top:-50px;right:-50px;
+}
+
+.o2{
+  width:180px;height:180px;
+  background:#00e5ff;
+  bottom:-50px;left:-50px;
+}
+
 </style>
 </head>
 
@@ -376,6 +559,31 @@ html, body{
 <script src="/socket.io/socket.io.js"></script>
 
 <!-- 2. Three.js core -->
+
+
+<canvas id="gameCanvas"></canvas>
+
+<!-- ATMOSPHERE -->
+<div class="glow-orb o1"></div>
+<div class="glow-orb o2"></div>
+
+<div class="vignette"></div>
+<div class="scanlines"></div>
+
+
+<div class="hud">
+
+  <form method="POST" id="logout" name="logout" action="/mainScene" class="exit-form">
+    <button type="submit" id="exit" name="exit">EXIT SECTOR</button>
+  </form>
+
+  <div class="user-tag">
+    USER: <%=username%>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <!-- 3. Three.js extras -->

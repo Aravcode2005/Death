@@ -5,6 +5,7 @@ const app = express();
 const socketIo = require('socket.io');
 const http = require('http');
 const server = http.createServer(app);
+const io = socketIo(server);
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
@@ -22,6 +23,7 @@ const io = socketIo(server, {
         methods: ["GET", "POST"]
     }
 });
+const MongoStore = require('connect-mongo');
 const cookieParser = require('cookie-parser');
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -53,6 +55,14 @@ const sessionMiddleware = session({
 })
 app.use(sessionMiddleware);
 
+const dotenv = require('dotenv');
+dotenv.config();
+const ConnectDB = require('./util/database');
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
 app.use(flash());
 app.get('/', (req, res, next) => {
     console.log('Cookies:', JSON.stringify(req.cookies));
@@ -74,6 +84,14 @@ app.get('/EchoesOfOblivion', (req, res, next) => {
 //     rootValue: graphqlResolver,
 //     graphiql:true
 // }))
+})
+app.get('/EchoesOfOblivion', (req, res, next) => {
+    res.render('Eco', {
+        pageTitle: "Echoes of Oblivion",
+        junglelink: '/mainScene',
+        sealink: '/sea'
+    })
+})
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.get('/sea', (req, res, next) => {
@@ -191,6 +209,18 @@ ConnectDB.then(() => {
         server.listen(FALLBACKPORT, () => console.log(`http://localhost:${FALLBACKPORT}`));
     }
     console.log("Error found in connecting " + error);
+io.on('connection', (socket) => {
+    console.log('A user connected');
+    socket.on('message', (data) => {
+        console.log('Message received:', data);
+        socket.emit('response', 'Message received');
+    });
+    socket.on('disconnect', () => console.log('User disconnected'));
+});
+ConnectDB.then(() => {
+    server.listen(3003, () => console.log("http://localhost:3003"));
+}).catch(err => {
+    console.log("Error found in connecting ");
 })
 
 
