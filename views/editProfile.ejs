@@ -698,29 +698,15 @@
             <span class="stat-val">45</span>
           </div>
         </div>
-
-        <!-- Form -->
         <div class="form-grid">
-          <form method="POST" action="/signup" id="userCredentials" name="userCredentials" enctype="multipart/form-data">
+          <form method="POST" action="/editProfile" id="userCredentials" name="userCredentials" enctype="multipart/form-data">
             <div class="form-grid">
-
-              <!-- Name + Email in a row -->
               <div class="field-row">
                 <div class="field-block">
                   <label class="px-label" for="Name"><span class="lbl-icon">⚔</span> HERO NAME</label>
                   <input class="input-glow" type="text" name="Name" id="Name" placeholder="e.g. Kira Shadowblade" required>
                 </div>
-                <div class="field-block">
-                  <label class="px-label" for="email"><span class="lbl-icon">✉</span> EMAIL</label>
-                  <input class="input-glow" type="email" name="email" id="email" placeholder="hero@realm.net" required>
-                </div>
               </div>
-
-              <!-- Password full width -->
-              <label class="px-label" for="Pswd"><span class="lbl-icon">🔒</span> SECRET SEAL</label>
-              <input class="input-glow" type="password" name="Pswd" id="Pswd" placeholder="Min 8 characters" required>
-
-              <!-- Photo upload -->
               <label class="px-label" for="image"><span class="lbl-icon">◈</span> AVATAR PHOTO</label>
               <div class="avatar-row">
                 <div class="avatar-preview" id="avatarPreview"></div>
@@ -729,16 +715,13 @@
                   <span class="file-hint">▸ JPG / PNG / WEBP · MAX 5MB</span>
                 </div>
               </div>
-
             </div>
-
             <div class="form-actions">
-              <button class="btn btn-primary" type="submit" id="save" name="save">▶ CONFIRM<br>REGISTRATION</button>
-              <button class="btn btn-secondary" type="button" onclick="location.href='/signin'">◀ ALREADY A<br>TRAVELER?</button>
+              <button class="btn btn-primary" type="submit" id="save" name="save">▶ EDIT HERO</button>
+              <button class="btn btn-secondary" type="button" onclick="location.href='/profile'">RETURN TO HERO</button>
             </div>
           </form>
         </div>
-
         <p class="footer-note">
           <span class="seal-icon">◈</span> YOUR DATA IS PROTECTED BY ANCIENT SEALS <span class="seal-icon">◈</span>
           <br>WELCOME TO THE VOYAGE
@@ -769,5 +752,4 @@
   </style>
 
 </body>
-</html>
 </html>

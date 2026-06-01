@@ -23,12 +23,23 @@ exports.postuserpage = (req, res, next) => {
         console.log("Error detected" + error);
     }
 }
+
 exports.getProfile = (req, res, next) => {
     res.render('profile', {
         pageTitle: "profile",
         personname: req.session.username,
         personemail: req.session.email,
         personimage: req.session.photo,
+        persongames:req.session.games
+
+    })
+}
+
+
+
+
+
+
     })
 }
 
