@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title><%=pageTitle%></title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+
+
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  height:100vh;
+  overflow:hidden;
+
+  font-family:'Press Start 2P', cursive;
+
+  background:
+    radial-gradient(circle at top, rgba(139,92,246,0.35), transparent 40%),
+    radial-gradient(circle at bottom, rgba(0,229,255,0.25), transparent 40%),
+    linear-gradient(#050816,#0b1024);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  color:white;
+}
+
+/* CRT scanlines */
+
+.scanlines{
+  position:absolute;
+  inset:0;
+  background:repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.04),
+    rgba(255,255,255,0.04) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+
+  pointer-events:none;
+  opacity:0.25;
+}
+
+/* floating glow orbs */
+
+.orb{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(60px);
+  opacity:0.4;
+}
+
+.orb1{
+  width:220px;
+  height:220px;
+  background:#8b5cf6;
+  top:-60px;
+  right:-60px;
+}
+
+.orb2{
+  width:200px;
+  height:200px;
+  background:#00e5ff;
+  bottom:-60px;
+  left:-60px;
+}
+
+/* =========================
+   MAIN PANEL
+========================= */
+
+.panel{
+  position:relative;
+  z-index:2;
+
+  width:min(600px, 90%);
+  padding:50px;
+
+  background:rgba(10,12,25,0.85);
+
+  border:4px solid #8b5cf6;
+
+  box-shadow:
+    0 0 20px rgba(139,92,246,0.5),
+    0 0 40px rgba(0,229,255,0.2);
+
+  backdrop-filter:blur(10px);
+
+  text-align:center;
+}
+
+/* corners */
+
+.panel::before,
+.panel::after{
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  border:3px solid #00e5ff;
+}
+
+.panel::before{
+  top:10px;
+  left:10px;
+  border-right:none;
+  border-bottom:none;
+}
+
+.panel::after{
+  bottom:10px;
+  right:10px;
+  border-left:none;
+  border-top:none;
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+  font-size:1.8rem;
+  margin-bottom:35px;
+
+  color:white;
+
+  text-shadow:
+    0 0 10px #00e5ff,
+    0 0 25px #8b5cf6;
+}
+
+.title span{
+  color:#00e5ff;
+}
+
+/* =========================
+   FORM BUTTONS
+========================= */
+
+form{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+button{
+  font-family:'Press Start 2P', cursive;
+
+  padding:18px;
+
+  cursor:pointer;
+
+  border:none;
+
+  font-size:0.65rem;
+
+  transition:0.2s;
+
+  position:relative;
+  overflow:hidden;
+}
+
+/* hover glow sweep */
+
+button::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+  transition:0.5s;
+}
+
+button:hover::before{
+  left:120%;
+}
+
+button:hover{
+  transform:translateY(-4px);
+}
+
+/* profile */
+
+button[name="action"][value="profile"]{
+  background:#8b5cf6;
+  color:white;
+  box-shadow:0 0 15px #8b5cf6;
+}
+
+/* game */
+
+button[name="action"][value="game"]{
+  background:#00e5ff;
+  color:#041018;
+  box-shadow:0 0 15px #00e5ff;
+}
+
+/* =========================
+   FOOT NOTE
+========================= */
+
+.note{
+  margin-top:30px;
+  font-size:0.5rem;
+  color:#b8c1ff;
+  opacity:0.8;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<div class="scanlines"></div>
+
+<div class="panel">
+
+  <div class="title">
+    SYSTEM<br>
+    <span>TERMINAL</span>
+  </div>
+
+  <form method="POST" id="profileform" name="profileform">
+
+    <button type="submit" value="profile" name="action">
+      ► PROFILE
+    </button>
+
+    <button type="submit" value="game" name="action">
+      ► START GAME
+    </button>
+
+  </form>
+
+  <div class="note">
+    Neural link active • awaiting command input...
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="/players.js"></script>
+
+</body>
+</html>s

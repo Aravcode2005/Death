@@ -2,14 +2,489 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width ,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title><%=pageTitle%></title>
+
 <link href="/css/scene.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Quicksand:wght@300;400;500&display=swap" rel="stylesheet"/>
+
+<style>
+:root{
+  --j-deep:   #050e08;
+  --j-lime:   #a8ff3e;
+  --j-teal:   #2dd4bf;
+  --j-gold:   #e8d97a;
+  --j-orchid: #c084fc;
+  --font-display: 'Cinzel Decorative', serif;
+  --font-body:    'Quicksand', sans-serif;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+html, body{
+  width:100%; height:100%;
+  overflow:hidden;
+  background:var(--j-deep);
+  font-family:var(--font-body);
+}
+
+#gameCanvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  z-index:0;
+}
+
+.j-mist{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:
+    radial-gradient(ellipse 70% 25% at 50% 100%, rgba(45,212,191,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 40% at 10% 80%,  rgba(168,255,62,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 35% at 90% 20%,  rgba(192,132,252,0.06) 0%, transparent 50%);
+  animation:mistdrift 14s ease-in-out infinite alternate;
+}
+
+@keyframes mistdrift{
+  from{ opacity:0.55; transform:translateX(-6px); }
+  to{   opacity:1;    transform:translateX(6px);  }
+}
+
+.j-vignette{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:1;
+  background:radial-gradient(ellipse at center, transparent 32%, rgba(3,8,5,0.82));
+}
+
+.j-particles{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+}
+
+.firefly{
+  position:absolute;
+  width:3px; height:3px;
+  border-radius:50%;
+  pointer-events:none;
+  animation:fly linear infinite;
+}
+
+@keyframes fly{
+  0%  { opacity:0;   transform:translate(0,0); }
+  12% { opacity:0.9; }
+  88% { opacity:0.6; }
+  100%{ opacity:0;   transform:translate(var(--dx),var(--dy)); }
+}
+
+.hud{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:100;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 24px;
+  background:linear-gradient(to bottom,
+    rgba(5,14,8,0.96) 0%,
+    rgba(5,14,8,0.65) 65%,
+    transparent 100%);
+  border-bottom:1px solid rgba(168,255,62,0.1);
+  pointer-events:auto;
+}
+
+.hud-center{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+}
+
+.sector-label{
+  font-size:9px;
+  font-weight:300;
+  letter-spacing:4px;
+  text-transform:uppercase;
+  color:rgba(168,255,62,0.45);
+}
+
+.sector-name{
+  font-family:var(--font-display);
+  font-size:11px;
+  color:var(--j-gold);
+  text-shadow:0 0 16px rgba(232,217,122,0.55);
+  letter-spacing:2px;
+}
+
+.status-pip{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:7px;
+  font-weight:500;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--j-lime);
+}
+
+.pip-dot{
+  width:6px; height:6px;
+  border-radius:50%;
+  background:var(--j-lime);
+  box-shadow:0 0 7px var(--j-lime);
+  animation:pip 2.4s ease-in-out infinite;
+}
+
+@keyframes pip{
+  0%,100%{ opacity:1;   transform:scale(1);   }
+  50%    { opacity:0.3; transform:scale(0.6); }
+}
+
+#exit{
+  background:transparent;
+  border:1px solid rgba(168,255,62,0.35);
+  color:var(--j-lime);
+  font-family:var(--font-body);
+  font-size:9px;
+  font-weight:500;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  padding:10px 16px;
+  cursor:pointer;
+  border-radius:2px;
+  transition:all 0.25s;
+  text-shadow:0 0 8px rgba(168,255,62,0.4);
+}
+
+#exit:hover{
+  background:rgba(168,255,62,0.09);
+  border-color:rgba(168,255,62,0.7);
+}
+
+.user-tag{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+}
+
+.user-tag-label{
+  font-size:7px;
+  font-weight:300;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:rgba(45,212,191,0.4);
+}
+
+.user-tag-name{
+  font-family:var(--font-display);
+  font-size:9px;
+  color:var(--j-teal);
+  border:1px solid rgba(45,212,191,0.28);
+  padding:5px 12px;
+  background:rgba(45,212,191,0.05);
+  border-radius:2px;
+  text-shadow:0 0 9px rgba(45,212,191,0.45);
+  letter-spacing:1px;
+}
+
+.chat-txt{
+  position:fixed;
+  right:22px;
+  bottom:22px;
+  width:350px;
+  height:355px;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  background:rgba(5,14,8,0.94);
+  border:1px solid rgba(168,255,62,0.2);
+  border-top:2px solid rgba(168,255,62,0.45);
+  border-radius:4px;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(29,185,84,0.07),
+    0 10px 44px rgba(0,0,0,0.65),
+    0 0 55px rgba(168,255,62,0.05),
+    inset 0 0 28px rgba(29,185,84,0.04);
+}
+
+.chat-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 15px;
+  background:rgba(168,255,62,0.04);
+  border-bottom:1px solid rgba(168,255,62,0.1);
+  flex-shrink:0;
+}
+
+.chat-header-title{
+  font-family:var(--font-display);
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--j-lime);
+  text-shadow:0 0 9px rgba(168,255,62,0.5);
+}
+
+.chat-header-status{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:7px;
+  font-weight:300;
+  letter-spacing:2px;
+  color:rgba(168,255,62,0.5);
+}
+
+.chat-header-dot{
+  width:5px; height:5px;
+  border-radius:50%;
+  background:var(--j-lime);
+  box-shadow:0 0 6px var(--j-lime);
+  animation:pip 2.2s ease-in-out infinite;
+}
+
+#messages{
+  flex:1;
+  overflow-y:auto;
+  list-style:none;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  min-height:0;
+}
+
+#messages::-webkit-scrollbar{ width:3px; }
+#messages::-webkit-scrollbar-track{ background:transparent; }
+#messages::-webkit-scrollbar-thumb{ background:rgba(168,255,62,0.22); border-radius:2px; }
+
+#messages li{
+  font-size:10px;
+  font-weight:400;
+  line-height:1.75;
+  padding:9px 11px;
+  background:rgba(29,185,84,0.05);
+  border-left:2px solid rgba(168,255,62,0.28);
+  border-radius:0 3px 3px 0;
+  word-break:break-word;
+}
+
+#messages li .msg-sender{
+  font-size:8px;
+  font-weight:600;
+  color:var(--j-gold);
+  letter-spacing:1px;
+  margin-bottom:3px;
+  text-shadow:0 0 7px rgba(232,217,122,0.4);
+}
+
+#messages li .msg-text{
+  color:rgba(195,238,207,0.85);
+}
+
+#chatForm{
+  display:flex;
+  border-top:1px solid rgba(168,255,62,0.1);
+  flex-shrink:0;
+}
+
+#chatIp{
+  flex:1;
+  background:rgba(0,0,0,0.45);
+  border:none;
+  border-right:1px solid rgba(168,255,62,0.1);
+  color:rgba(195,238,207,0.9);
+  padding:11px 13px;
+  outline:none;
+  font-family:var(--font-body);
+  font-size:10px;
+  font-weight:300;
+}
+
+#chatIp::placeholder{ color:rgba(168,255,62,0.22); }
+#chatIp:focus{ background:rgba(29,185,84,0.05); }
+
+#chatForm button{
+  background:rgba(168,255,62,0.07);
+  border:none;
+  color:var(--j-lime);
+  font-family:var(--font-display);
+  font-size:8px;
+  padding:11px 15px;
+  cursor:pointer;
+  letter-spacing:1px;
+  transition:background 0.2s;
+  text-shadow:0 0 7px rgba(168,255,62,0.4);
+}
+
+#chatForm button:hover{ background:rgba(168,255,62,0.15); }
+</style>
 </head>
+
 <body>
-<canvas id="gameCanvas">gameCanvas</canvas>
+<canvas id="gameCanvas"></canvas>
+
+<div class="j-mist"></div>
+<div class="j-vignette"></div>
+<div class="j-particles" id="particles"></div>
+
+<div class="hud">
+  <form method="POST" action="/mainScene">
+    <button type="submit" id="exit">Exit Sector</button>
+  </form>
+
+  <div class="hud-center">
+    <span class="sector-label">Sector Online</span>
+    <span class="sector-name"><%=pageTitle%></span>
+    <span class="status-pip">
+      <span class="pip-dot"></span>
+      Active
+    </span>
+  </div>
+
+  <div class="user-tag">
+    <span class="user-tag-label">Pilot</span>
+    <span class="user-tag-name"><%=username%></span>
+  </div>
+</div>
+
+<div class="chat-txt">
+  <div class="chat-header">
+    <span class="chat-header-title">Chat</span>
+    <span class="chat-header-status">
+      <span class="chat-header-dot"></span>
+      Live
+    </span>
+  </div>
+  <ul id="messages"></ul>
+  <form id="chatForm">
+    <input type="text" id="chatIp" placeholder="Transmit signal...">
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<!-- 1. Socket.IO -->
+<script src="/socket.io/socket.io.js"></script>
+
+<!-- 2. Three.js core -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<!-- 3. Three.js extras -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/renderers/CSS2DRenderer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+
+<!-- 4. Inline chat + socket wiring (needs socket.io loaded above) -->
+<script>
+const socket = io();
+const form = document.getElementById('chatForm');
+const input = document.getElementById('chatIp');
+const messageBody = document.getElementById('messages');
+
+const typingLi = document.createElement('li');
+typingLi.style.cssText = 'font-style:italic; color:rgba(168,255,62,0.45); font-size:9px; border:none; background:none; padding:4px 11px;';
+typingLi.style.display = 'none';
+messageBody.appendChild(typingLi);
+
+const typingPeople = new Map();
+let typingTimer;
+
+function renderTypingUI() {
+  const names = [...typingPeople.values()];
+  if (names.length === 0) {
+    typingLi.style.display = 'none';
+    typingLi.textContent = '';
+  } else if (names.length === 1) {
+    typingLi.style.display = 'block';
+    typingLi.textContent = `${names[0]} is typing...`;
+  } else {
+    typingLi.style.display = 'block';
+    typingLi.textContent = `${names.join(', ')} are typing...`;
+  }
+  messageBody.scrollTop = messageBody.scrollHeight;
+}
+
+const myUsername = '<%=username%>';
+
+input.addEventListener('input', () => {
+  socket.emit('start typing');
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    socket.emit('stop typing');
+  }, 1000);
+});
+
+form.addEventListener('submit', function(e) {
+  e.preventDefault();
+  if (input.value.trim()) {
+    clearTimeout(typingTimer);
+    socket.emit('stop typing');
+    socket.emit('chat message', { msg: input.value, username: myUsername });
+    input.value = '';
+  }
+});
+
+socket.on('connect', () => {
+  socket.emit('join-room');
+});
+
+socket.on('start typing', (data) => {
+  typingPeople.set(data.userId, data.username);
+  renderTypingUI();
+});
+
+socket.on('stop typing', (data) => {
+  typingPeople.delete(data.userId);
+  renderTypingUI();
+});
+
+socket.on('chat message', (msg) => {
+  if (typingLi.parentNode === messageBody) messageBody.removeChild(typingLi);
+  const li = document.createElement('li');
+  const sender = document.createElement('div');
+  sender.className = 'msg-sender';
+  sender.textContent = msg.username;
+  const text = document.createElement('div');
+  text.className = 'msg-text';
+  text.textContent = msg.msg;
+  li.appendChild(sender);
+  li.appendChild(text);
+  messageBody.appendChild(li);
+  messageBody.appendChild(typingLi);
+  messageBody.scrollTop = messageBody.scrollHeight;
+});
+
+(function spawnFireflies() {
+  const wrap = document.getElementById('particles');
+  const cols = ['#a8ff3e','#2dd4bf','#c084fc','#e8d97a','#4ade80'];
+  for (let i = 0; i < 24; i++) {
+    const el = document.createElement('div');
+    el.className = 'firefly';
+    const c = cols[i % cols.length];
+    el.style.cssText =
+      'left:'  + (Math.random() * 100) + '%;' +
+      'top:'   + (Math.random() * 100) + '%;' +
+      'background:' + c + ';' +
+      'box-shadow:0 0 5px ' + c + ',0 0 12px ' + c + '66;' +
+      '--dx:'  + ((Math.random() - 0.5) * 280) + 'px;' +
+      '--dy:'  + ((Math.random() - 0.5) * 260) + 'px;' +
+      'animation-duration:' + (5 + Math.random() * 9) + 's;' +
+      'animation-delay:'    + (Math.random() * 8) + 's;';
+    wrap.appendChild(el);
+  }
+})();
+</script>
+
+<!-- 5. Game logic LAST (needs THREE + socket + CSS2DRenderer) -->
 <script src="/players.js"></script>
+
 </body>
 </html>
