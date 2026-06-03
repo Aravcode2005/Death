@@ -9,6 +9,9 @@ const userSchema = new Schema({
         required: true
     },
     gamesplayed:  Number,
+    
+
+
 }, {
     timestamps: true
 });

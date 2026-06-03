@@ -106,12 +106,8 @@ Scene.add(disc);
 
 class Player {
     name;
-    era;
-    position;
     constructor(name, era, position) {
         this.name = name;
-        this.era = era;
-        this.position = position;
     }
 };
 
@@ -121,7 +117,6 @@ class Playeractions extends Player {
     z = 0;
     theta;
     color;
-    mass;
     moveUp = false;
     moveDown = false;
     moveLeft = false;
@@ -131,13 +126,12 @@ class Playeractions extends Player {
     rotate = false;
     movementdynamics = [];
     health = [];
-    constructor(name, era, position, X, Y, Z, Color, arr = [], health = [], mass) {
-        super(name, era, position);
+    constructor(name, X, Y, Z, Color, arr = [], health = []) {
+        super(name);
         this.x = X;
         this.y = Y;
         this.z = Z;
         this.color = Color;
-        this.mass = mass;
         this.health[0] = 50;
         this.movementdynamics = [[X, Y, Z]];
         this.player = new THREE.Mesh(
@@ -187,11 +181,6 @@ class Playeractions extends Player {
         this.player.add(label2);
         Scene.add(this.player);
     }
-
-    fullinfo() {
-        console.log(this.name, this.era, this.position, this.movementdynamics);
-    }
-
     gravity(delta) {
 
         if (this.y > 0) {
@@ -203,6 +192,7 @@ class Playeractions extends Player {
     }
 
 };
+
 let cnt = 0;
 const playerrecord = [];
 const players = {};
@@ -212,31 +202,26 @@ socket.on('connect', () => {
     console.log('Connected', socket.id);
 });
 
-socket.on('disconnect', () => {
-    console.log('Disconnected from server');
-});
-
-socket.on('lobby-update', (data) => {
-    console.log(JSON.stringify(data.squad));
-    const OBJ = data.squad;
-    console.log("The length of the object is :)", Object.keys(OBJ).length);
-    const matrix = [];
-    for (let i = 1; i <= Object.keys(OBJ).length; i++) {
-        console.log("Hello" + JSON.stringify(OBJ[i.toString()]));
-        matrix.push((OBJ[i.toString()]));
+function find(id, obj = {}) {
+    for (const i in obj) {
+        if (obj[i] === id) {
+            return true;
+        }
     }
-
-    console.log("Displaying the matrix");
-    for (let i = 0; i < matrix.length; i++) {
-        for (let j = 0; j < matrix[i].length; j++) {
-            if (!players[matrix[i][j].socketId]) {
+    return false;
+}
+socket.on('lobby-update', (data) => {
+    console.log("This is the object", data.squad);
+    for (const obj in data.squad) {
+        let array = data.squad[obj];
+        for (let i = 0; i < array.length; i++) {
+            if (!players[array[i].socketId]) {
                 cnt += 10;
-                players[matrix[i][j].socketId] = new Playeractions("Xing", "Past", "Monk", cnt, 0, 0, colors[(cnt / 10) - 1], [], [], 5)
+                players[array[i].socketId] = new Playeractions(array[i].Name, cnt, 0, 0, colors[(cnt / 10 - 1) % colors.length], [], []);
             }
         }
     }
 });
-
 const keyMap = {
     u: 'moveUp',
     d: 'moveDown',
@@ -261,7 +246,7 @@ document.addEventListener('keydown', (event) => {
 
     if (keyMap[key] === 'moveDown') {
         console.log("downward movement");
-        if (players[socket.id].y >= 1) {
+        if (players[socket.id].y >= 2) {
             players[socket.id].moveDown = true;
         }
 
@@ -289,7 +274,7 @@ document.addEventListener('keydown', (event) => {
 
     }
     if (keyMap[key] === 'moveBackward') {
-        console.log("down ward movement");
+        console.log("downward movement");
         if (players[socket.id].z >= -99) {
             players[socket.id].moveBackward = true;
         }
@@ -355,9 +340,19 @@ function animate() {
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
                 canmove = false;
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
                 break;
             }
         }
+
 
         if (canmove) {
             players[socket.id].y -= velocity * delta;
@@ -375,6 +370,17 @@ function animate() {
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
                 canmove = false;
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
+
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
+
                 break;
             }
         }
@@ -393,7 +399,18 @@ function animate() {
             ];
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
+
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
                 canmove = false;
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
+
                 break;
             }
         }
@@ -413,7 +430,16 @@ function animate() {
             ];
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
                 canmove = false;
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
                 break;
             }
         }
@@ -433,7 +459,16 @@ function animate() {
             ];
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
                 canmove = false;
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
                 break;
             }
         }
@@ -453,7 +488,16 @@ function animate() {
             ];
             if (it === socket.id) continue;
             if (willcollide(newpos, newarr)) {
+                players[socket.id].health[0]--;
+                players[it].health[0]--;
+                if (players[socket.id].health[0] === 0) {
+                    players[socket.id].health[0] = 50;
+                }
+                if (players[it].health[0] === 0) {
+                    players[it].health[0] = 50;
+                }
                 canmove = false;
+                players[socket.id].hpDiv.textContent = players[socket.id].health[0];
                 break;
             }
         }
@@ -484,8 +528,34 @@ function network() {
         x: players[socket.id].x,
         y: players[socket.id].y,
         z: players[socket.id].z,
-    },);
+    }, {
+    });
+
+    socket.emit("update health", {
+        health: players[socket.id].health[0]
+    })
+
 }
+socket.on('leave-room', (data) => {
+    const leftplayer = data.left
+    const id = data.id;
+    console.log("Left player is", leftplayer);
+    console.log("Id of the player is ", id);
+    if (players[id]) {
+
+        players[id].player.traverse((obj=>{
+            if(obj.element){
+                obj.element.remove();
+            }
+        }))
+        Scene.remove(players[id].player);
+        players[id].player.geometry.dispose();
+        players[id].player.material.dispose();
+        delete players[id];
+    }
+})
+
+
 socket.on('movement', (data) => {
     const id = data.id;
     const pos = data.pos;
@@ -496,7 +566,23 @@ socket.on('movement', (data) => {
     players[id].y = pos.y;
     players[id].z = pos.z;
     players[id].player.position.set(players[id].x, players[id].y, players[id].z);
-
 })
+
+socket.on('health info', (data) => {
+    const id = data.id;
+    const heal = data.health;
+    if (!players[id]) {
+        return;
+    }
+    players[id].health[0] = heal.health
+    players[id].hpDiv.textContent = players[id].health[0];
+})
+
+socket.on('duplicate', (data) => {
+    console.log("HELLO"+ data.message);
+    socket.disconnect(true);
+    window.location.href = '/user';
+})
+
 setInterval(() => network(), 100);
 animate();
