@@ -14,12 +14,6 @@ const transporter = nodemailer.createTransport(({
     }
 
 }))
-const userdata = require('../model/user');
-const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { options } = require('../routes/auth');
-dotenv.config();
 exports.getSignin = (req, res, next) => {
     let message = req.flash('error');
     if (message.length > 0) {
@@ -40,9 +34,6 @@ exports.getSignin = (req, res, next) => {
 
 }
 exports.postSignin = async (req, res, next) => {
-
-    
-
     try {
         const email = req.body.email;
         const password = req.body.Pswd;
@@ -137,12 +128,6 @@ exports.getMainScene = async (req, res, next) => {
             gamesplayed: totalgames
         });
         console.log(info);
-exports.getMainScene = (req, res, next) => {
-    if (req.session.isLoggedIn) {
-        res.render('mainScene', {
-            pageTitle: "mainScene",
-            username: req.session.username
-        })
     }
     else if (!req.session.isLoggedIn) {
         console.log('User not authenticated');
@@ -170,7 +155,6 @@ exports.postLogout = (req, res, next) => {
     });
 }
 exports.getSignup = (req, res, next) => {
-    res.render('signup', {
     res.render("signup", {
         pageTitle: "Signup"
     })
@@ -191,10 +175,7 @@ exports.postSignup = async (req, res, next) => {
         const image = req.file;
         const games = 0;
         console.log(image);
-        let isimage = true;
-        if (!image) {
-            isimage = false;
-        console.log(image);
+
         if (!image) {
             try {
                 return res.status(422).redirect('/error');
@@ -203,6 +184,8 @@ exports.postSignup = async (req, res, next) => {
             }
             return;
         }
+
+
         else if (image) {
             console.log("Checkpoint 2 hit!!!")
             console.log("We have the image");
@@ -254,30 +237,33 @@ exports.postSignup = async (req, res, next) => {
                     console.log("Phattt gya BC!");
                     res.redirect('/signup');
                 }
-        else {
-            const dupname = await userdata.findOne({ name: name });
-            if (dupname) {
-                console.log("Username already exists");
-                return res.redirect('/signup');
+                else {
+                    const dupname = await userdata.findOne({ name: name });
+                    if (dupname) {
+                        console.log("Username already exists");
+                        return res.redirect('/signup');
 
-            }
-            const dupmail = await userdata.findOne({ email: email });
-            if (dupmail) {
-                req.flash('error', "Email id already exists ,signin to continue");
-                return res.redirect('/signin');
+                    }
+                    const dupmail = await userdata.findOne({ email: email });
+                    if (dupmail) {
+                        req.flash('error', "Email id already exists ,signin to continue");
+                        return res.redirect('/signin');
 
-            }
-            else {
-                const hashedpassword = await bcrypt.hash(password, 12);
-                await userdata.create({
-                    name: name,
-                    email: email,
-                    password: hashedpassword,
-                    imageUrl: '/images/' + image.filename
-                })
-                return res.redirect('/signin');
+                    }
+                    else {
+                        const hashedpassword = await bcrypt.hash(password, 12);
+                        await userdata.create({
+                            name: name,
+                            email: email,
+                            password: hashedpassword,
+                            imageUrl: '/images/' + image.filename
+                        })
+                        return res.redirect('/signin');
 
+                    }
+                }
             }
+
         }
     }
     catch (error) {

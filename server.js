@@ -184,10 +184,7 @@ io.on('connection', (socket) => {
                 left: leftuser,
                 id: socket.id
             })
-
-
         })
-
         socket.on('start typing', () => {
             try {
                 socket.to(socket.roomId).emit('start typing', {

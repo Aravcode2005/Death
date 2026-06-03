@@ -7,9 +7,4 @@ router.post('/user',authController.isAuthenticated,authController.verifyJwt,user
 router.get('/profile',authController.verifyJwt,userController.getProfile);
 module.exports=router;
 
-router.get('/user',authController.verifyJwt,userController.getuserpage);
-router.post('/user',userController.postuserpage);
-router.get('/profile',authController.verifyJwt,userController.getProfile);
-module.exports=router;
-
 
