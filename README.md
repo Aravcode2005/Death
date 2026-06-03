@@ -1,4 +1,5 @@
-# Echoes of Oblivion
+# Pixel Fantasy
+
 
 A Node.js multiplayer game portal with authentication, user profile management, file upload, email signup confirmation, and room-based socket communication.
 
